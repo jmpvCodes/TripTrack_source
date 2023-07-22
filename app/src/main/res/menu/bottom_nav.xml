@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item
+			android:id="@+id/bottom_nav_my_trips"
+			android:title="Mis Viajes"
+			android:icon="@drawable/ic_trips" />
+
+	<item
+			android:id="@+id/bottom_nav_world"
+			android:title="Mapamundi"
+			android:icon="@drawable/mundo" />
+
+	<item
+			android:id="@+id/bottom_nav_settings"
+			android:title="Configuración"
+			android:icon="@drawable/ic_settings" />
+</menu>

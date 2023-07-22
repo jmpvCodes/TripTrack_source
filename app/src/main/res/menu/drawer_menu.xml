@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item
+			android:id="@+id/nav_home"
+			android:title="Inicio" />
+	<item
+			android:id="@+id/nav_my_trips"
+			android:title="Mis Viajes" />
+
+	<item
+			android:id="@+id/nav_my_world"
+			android:title="Mapamundi" />
+	<item
+			android:id="@+id/nav_settings"
+			android:title="Configuración" />
+
+	<item
+			android:id="@+id/sign_out"
+			android:title="Cerrar sesión"
+	/>
+</menu>

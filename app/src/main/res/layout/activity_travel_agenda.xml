@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+										   xmlns:app="http://schemas.android.com/apk/res-auto"
+										   android:id="@+id/drawer_layout"
+										   android:layout_width="match_parent"
+										   android:layout_height="match_parent">
+
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:orientation="vertical">
+
+		<!-- AppBar -->
+		<androidx.appcompat.widget.Toolbar
+				android:id="@+id/toolbar"
+				android:layout_width="match_parent"
+				android:layout_height="?attr/actionBarSize"
+				android:orientation="horizontal"
+				android:gravity="center_vertical"
+				android:background="#FFFFFF">
+
+			<ImageButton
+					android:id="@+id/back_button"
+					android:layout_width="50dp"
+					android:layout_height="50dp"
+					android:layout_marginStart="8dp"
+					android:layout_marginEnd="8dp"
+					android:backgroundTint="@color/white"
+					android:src="@drawable/ic_arrow_back"
+					android:contentDescription="BACK BUTTON"
+					android:scaleType="fitStart" />
+
+			<!-- Logo -->
+			<ImageView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/triptrack_small"
+					android:scaleType="fitStart"
+					android:padding="8dp" />
+
+		</androidx.appcompat.widget.Toolbar>
+
+		<!-- Title -->
+		<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:id="@+id/textView"
+				android:text="AGENDA DE VIAJE"
+				android:textSize="24sp"
+				android:textColor="#000000"
+				android:layout_gravity="center_horizontal"
+				android:layout_marginTop="16dp"
+				android:layout_marginBottom="16dp" />
+
+
+		<!-- Event Name -->
+		<EditText
+				android:id="@+id/event_name_edittext"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:hint="Nombre del evento"
+				android:layout_marginHorizontal="16dp" />
+
+		<!-- Event Priority -->
+		<Spinner
+				android:id="@+id/event_priority_spinner"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginHorizontal="16dp"
+				android:spinnerMode="dropdown" />
+
+		<!-- Event Start Date -->
+		<TextView
+				android:id="@+id/start_date_textview"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="Fecha de inicio"
+				android:textSize="18sp"
+				android:layout_marginHorizontal="16dp"
+				android:layout_marginTop="16dp" />
+
+		<!-- Event End Date -->
+		<TextView
+				android:id="@+id/end_date_textview"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="Fecha de fin"
+				android:textSize="18sp"
+				android:layout_marginHorizontal="16dp"
+				android:layout_marginTop="8dp" />
+
+		<!-- Save Button -->
+		<Button
+				android:id="@+id/save_button"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="Guardar"
+				android:layout_marginHorizontal="16dp"
+				android:layout_marginTop="16dp" />
+
+	</LinearLayout>
+
+</androidx.drawerlayout.widget.DrawerLayout>

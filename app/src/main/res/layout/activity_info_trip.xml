@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+										   xmlns:app="http://schemas.android.com/apk/res-auto"
+										   android:id="@+id/drawer_layout"
+										   android:layout_width="match_parent"
+										   android:layout_height="match_parent">
+
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:orientation="vertical">
+
+	<!-- AppBar -->
+	<androidx.appcompat.widget.Toolbar
+			android:id="@+id/toolbar"
+			android:layout_width="match_parent"
+			android:layout_height="?attr/actionBarSize"
+			android:orientation="horizontal"
+			android:gravity="center_vertical"
+			android:background="#FFFFFF">
+
+		<ImageButton
+				android:id="@+id/back_button"
+				android:layout_width="50dp"
+				android:layout_height="50dp"
+				android:layout_marginStart="8dp"
+				android:layout_marginEnd="8dp"
+				android:backgroundTint="@color/white"
+				android:src="@drawable/ic_arrow_back"
+				android:contentDescription="BACK BUTTON"
+				android:scaleType="fitStart"/>
+
+
+		<!-- Logo -->
+		<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/triptrack_small"
+				android:scaleType="fitStart"
+				android:padding="8dp"
+		/>
+
+
+	</androidx.appcompat.widget.Toolbar>
+
+	<androidx.cardview.widget.CardView
+			android:id="@+id/card_view"
+			android:layout_width="match_parent"
+			android:layout_height="220dp"
+			app:cardElevation="4dp"
+			app:cardBackgroundColor="@color/example_color"
+			>
+
+		<FrameLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:background="@drawable/card_border">
+
+			<View
+					android:id="@+id/view"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:background="@android:color/transparent"
+			/>
+
+
+		<LinearLayout
+				android:orientation="vertical"
+				android:paddingLeft="15dp"
+				android:paddingBottom="15dp"
+				android:paddingRight="15dp"
+				android:paddingTop="15dp"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent">
+
+			<TextView
+					android:id="@+id/destination_text"
+					android:textColor="@color/black"
+					android:textSize="30sp"
+					android:paddingBottom="25dp"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" />
+
+			<LinearLayout android:orientation="horizontal"
+						  android:layout_width="wrap_content"
+						  android:layout_height="wrap_content">
+			<TextView
+					android:id="@+id/departure_date_text"
+					android:textColor="@color/black"
+					android:textSize="18sp"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" />
+
+			<TextView
+					android:id="@+id/return_date_text"
+					android:textColor="@color/black"
+					android:textSize="18sp"
+					android:paddingLeft="105dp"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" />
+
+			</LinearLayout>
+
+
+		<TextView
+				android:id="@+id/people_count_text"
+				android:textColor="@color/black"
+				android:textSize="18sp"
+				android:paddingTop="30dp"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+
+			<LinearLayout android:orientation="horizontal"
+						  android:layout_width="wrap_content"
+						  android:layout_height="wrap_content">
+
+		<TextView
+				android:id="@+id/price_text"
+				android:textColor="@color/black"
+				android:textSize="18sp"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+
+			<ImageButton
+					android:id="@+id/import_photo_button"
+					android:layout_width="35dp"
+					android:layout_height="35dp"
+					android:layout_marginRight="30dp"
+					android:layout_marginLeft="300dp"
+					android:scaleType="fitStart"
+					android:background="@android:color/transparent"
+					android:src="@drawable/import_photo_button"
+					android:contentDescription="IMPORT PHOTO BUTTON"/>
+
+			</LinearLayout>
+
+		</LinearLayout>
+
+		</FrameLayout>
+
+	</androidx.cardview.widget.CardView>
+
+		<GridLayout
+				android:id="@+id/linearLayout"
+				android:layout_width="match_parent"
+				android:layout_height="350dp"
+				android:columnCount="2"
+				android:rowCount="2"
+				android:layout_below="@id/card_view">
+
+		<androidx.cardview.widget.CardView
+				android:layout_width="0dp"
+				android:layout_height="175dp"
+				android:layout_columnWeight="1"
+				android:clickable="true"
+				android:focusable="true"
+				app:cardElevation="50dp"
+				android:id="@+id/import_documents"
+				app:cardBackgroundColor="@color/colorAccent">
+
+			<FrameLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content">
+
+				<ImageView
+						android:layout_width="match_parent"
+						android:layout_height="match_parent"
+						android:scaleType="centerCrop"
+						android:src="@drawable/almacen_de_ficheros"/>
+
+				<View
+						android:layout_width="match_parent"
+						android:layout_height="match_parent"
+						android:background="#B0000000"/>
+
+				<LinearLayout
+						android:layout_width="match_parent"
+						android:layout_height="match_parent"
+						android:orientation="vertical"
+						android:gravity="center">
+
+					<TextView
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:textColor="#FFFFFF"
+							android:layout_margin="20dp"
+							android:textSize="15dp"
+							android:text="Importar documentos"/>
+
+					<ImageView
+							android:layout_width="30dp"
+							android:layout_height="30dp"
+							android:src="@drawable/upload_documents"/>
+				</LinearLayout>
+
+			</FrameLayout>
+
+
+		</androidx.cardview.widget.CardView>
+
+			<androidx.cardview.widget.CardView
+					android:layout_width="0dp"
+					android:layout_height="175dp"
+					android:layout_columnWeight="1"
+					android:clickable="true"
+					android:focusable="true"
+					app:cardElevation="50dp"
+					android:id="@+id/expense_calculation"
+					app:cardBackgroundColor="@color/colorAccent">
+
+				<FrameLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content">
+
+					<ImageView
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:scaleType="centerCrop"
+							android:src="@drawable/calculo_presupuesto"/>
+
+					<View
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:background="#B0000000"/>
+
+					<LinearLayout
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:orientation="vertical"
+							android:gravity="center">
+
+						<TextView
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:textColor="#FFFFFF"
+								android:layout_margin="20dp"
+								android:textSize="15dp"
+								android:text="Cálculo presupuestario"/>
+
+						<ImageView
+								android:layout_width="30dp"
+								android:layout_height="30dp"
+								android:src="@drawable/calculator"/>
+					</LinearLayout>
+
+				</FrameLayout>
+
+
+			</androidx.cardview.widget.CardView>
+
+			<androidx.cardview.widget.CardView
+					android:layout_width="0dp"
+					android:layout_height="175dp"
+					android:layout_columnWeight="1"
+					android:clickable="true"
+					android:focusable="true"
+					app:cardElevation="50dp"
+					android:id="@+id/travel_agenda"
+					app:cardBackgroundColor="@color/colorAccent">
+
+				<FrameLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content">
+
+					<ImageView
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:scaleType="centerCrop"
+							android:src="@drawable/agenda_viaje"/>
+
+					<View
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:background="#B0000000"/>
+
+					<LinearLayout
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:orientation="vertical"
+							android:gravity="center">
+
+						<TextView
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:textColor="#FFFFFF"
+								android:layout_margin="20dp"
+								android:textSize="15dp"
+								android:text="Agenda de viaje"/>
+
+						<ImageView
+								android:layout_width="30dp"
+								android:layout_height="30dp"
+								android:src="@drawable/calendar"/>
+					</LinearLayout>
+
+				</FrameLayout>
+
+
+			</androidx.cardview.widget.CardView>
+
+			<androidx.cardview.widget.CardView
+					android:layout_width="0dp"
+					android:layout_height="175dp"
+					android:layout_columnWeight="1"
+					android:clickable="true"
+					android:focusable="true"
+					app:cardElevation="50dp"
+					android:id="@+id/album_photos"
+					app:cardBackgroundColor="@color/colorAccent">
+
+				<FrameLayout
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content">
+
+					<ImageView
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:scaleType="centerCrop"
+							android:src="@drawable/album_fotos_background"/>
+
+					<View
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:background="#B0000000"/>
+
+					<LinearLayout
+							android:layout_width="match_parent"
+							android:layout_height="match_parent"
+							android:orientation="vertical"
+							android:gravity="center">
+
+						<TextView
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:textColor="#FFFFFF"
+								android:layout_margin="20dp"
+								android:textSize="15dp"
+								android:text="Álbum de fotos"/>
+
+						<ImageView
+								android:layout_width="30dp"
+								android:layout_height="30dp"
+								android:src="@drawable/album_fotos"/>
+					</LinearLayout>
+
+				</FrameLayout>
+
+
+			</androidx.cardview.widget.CardView>
+
+		</GridLayout>
+
+		<!-- Bottom Navigation Bar -->
+		<com.google.android.material.bottomnavigation.BottomNavigationView
+				android:id="@+id/bottom_navigation"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="bottom"
+				android:background="?android:attr/windowBackground"
+				app:menu="@menu/bottom_nav"/>
+
+	</LinearLayout>
+
+
+</androidx.drawerlayout.widget.DrawerLayout>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "226902103272",
+    "project_id": "triptrack-e9702",
+    "storage_bucket": "triptrack-e9702.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:226902103272:android:bbcbfeae4ad4fba7b8a55d",
+        "android_client_info": {
+          "package_name": "com.example.triptrack"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "226902103272-p33gn3lsr01f0t146e7gi8sc58fsj09e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAr0BRfOQW0v7VoAsJy2wIg1Uj535jIXLw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "226902103272-p33gn3lsr01f0t146e7gi8sc58fsj09e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
