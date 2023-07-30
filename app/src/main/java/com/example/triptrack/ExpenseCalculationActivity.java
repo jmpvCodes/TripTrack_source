@@ -21,8 +21,6 @@ import java.util.ArrayList;
 
 public class ExpenseCalculationActivity extends AppCompatActivity {
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,24 +28,31 @@ public class ExpenseCalculationActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> onBackPressed());
 
-        // Configurar el TabLayout
+        String tripId = getIntent().getStringExtra("tripId");
+
+// Configurar el TabLayout
         TabLayout tabLayout = findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Presupuesto"));
         tabLayout.addTab(tabLayout.newTab().setText("Facturas"));
 
         ViewPager viewPager = findViewById(R.id.view_pager);
 
-        // Crear un adaptador para el ViewPager
+// Crear un adaptador para el ViewPager
         FragmentPagerAdapter adapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             @NonNull
             @Override
             public Fragment getItem(int position) {
                 if (position == 0) {
-                    return new BudgetTabFragment();
+                    BudgetTabFragment budgetTabFragment = new BudgetTabFragment();
+                    Bundle args = new Bundle();
+                    args.putString("tripId", tripId);
+                    budgetTabFragment.setArguments(args);
+                    return budgetTabFragment;
                 } else {
                     return new InvoiceTabFragment();
                 }
@@ -70,7 +75,7 @@ public class ExpenseCalculationActivity extends AppCompatActivity {
         };
         viewPager.setAdapter(adapter);
 
-        // Conectar el TabLayout con el ViewPager
+// Conectar el TabLayout con el ViewPager
         tabLayout.setupWithViewPager(viewPager);
     }
-}
+    }

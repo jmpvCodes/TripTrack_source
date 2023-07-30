@@ -16,87 +16,88 @@
 				android:layout_width="match_parent"
 				android:layout_height="?attr/actionBarSize"
 				android:orientation="horizontal"
+				android:backgroundTint="@color/white"
 				android:gravity="center_vertical"
 				android:background="#FFFFFF">
 
 			<ImageButton
 					android:id="@+id/back_button"
-					android:layout_width="50dp"
-					android:layout_height="50dp"
+					android:layout_width="45dp"
+					android:layout_height="45dp"
 					android:layout_marginStart="8dp"
+					android:layout_gravity="left"
 					android:layout_marginEnd="8dp"
 					android:backgroundTint="@color/white"
 					android:src="@drawable/ic_arrow_back"
 					android:contentDescription="BACK BUTTON"
 					android:scaleType="fitStart" />
 
+			<!-- Title -->
+			<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:id="@+id/textView"
+					android:gravity="left"
+					android:text="AGENDA DE VIAJE"
+					android:textSize="16sp"
+					android:textColor="@color/colorPrimary"
+					android:textStyle="bold"
+					android:layout_marginTop="16dp"
+					android:layout_marginBottom="16dp" />
+
 			<!-- Logo -->
 			<ImageView
-					android:layout_width="wrap_content"
+					android:layout_width="150dp"
+					android:layout_gravity="right"
 					android:layout_height="wrap_content"
 					android:src="@drawable/triptrack_small"
 					android:scaleType="fitStart"
-					android:padding="8dp" />
+					android:padding="14dp" />
+
 
 		</androidx.appcompat.widget.Toolbar>
 
-		<!-- Title -->
-		<TextView
+		<!-- CalendarView -->
+		<CalendarView
+				android:id="@+id/calendarView"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+
+		<!-- Add new trip button -->
+		<Button
+				android:id="@+id/add_trip_button"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:id="@+id/textView"
-				android:text="AGENDA DE VIAJE"
-				android:textSize="24sp"
-				android:textColor="#000000"
+				android:text="NUEVO PLAN"
+				android:textSize="15sp"
 				android:layout_gravity="center_horizontal"
-				android:layout_marginTop="16dp"
-				android:layout_marginBottom="16dp" />
+				android:layout_marginTop="10dp"
+				android:layout_marginBottom="16dp"
+				android:backgroundTint="@color/colorPrimary" />
 
 
-		<!-- Event Name -->
-		<EditText
-				android:id="@+id/event_name_edittext"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:hint="Nombre del evento"
-				android:layout_marginHorizontal="16dp" />
-
-		<!-- Event Priority -->
-		<Spinner
-				android:id="@+id/event_priority_spinner"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginHorizontal="16dp"
-				android:spinnerMode="dropdown" />
-
-		<!-- Event Start Date -->
+		<!-- Scheduled trips list -->
 		<TextView
-				android:id="@+id/start_date_textview"
-				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text="Fecha de inicio"
-				android:textSize="18sp"
-				android:layout_marginHorizontal="16dp"
-				android:layout_marginTop="16dp" />
+				android:layout_width="wrap_content"
+				android:layout_gravity="center_horizontal"
+				style="?android:listSeparatorTextViewStyle"
+				android:text="PLANES PROGRAMADOS" />
 
-		<!-- Event End Date -->
-		<TextView
-				android:id="@+id/end_date_textview"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:text="Fecha de fin"
-				android:textSize="18sp"
-				android:layout_marginHorizontal="16dp"
-				android:layout_marginTop="8dp" />
+		<ListView
+				android:layout_height="126dp"
+				android:layout_width="wrap_content"
+				style="?android:listViewWhiteStyle"
+				android:id="@+id/scheduled_trips_list" />
 
-		<!-- Save Button -->
-		<Button
-				android:id="@+id/save_button"
+		<com.google.android.material.bottomnavigation.BottomNavigationView
+				android:id="@+id/bottom_navigation"
 				android:layout_width="match_parent"
+				android:layout_gravity="center|bottom"
 				android:layout_height="wrap_content"
-				android:text="Guardar"
-				android:layout_marginHorizontal="16dp"
-				android:layout_marginTop="16dp" />
+				android:background="?android:attr/windowBackground"
+				app:menu="@menu/bottom_nav"/>
+
 
 	</LinearLayout>
 

@@ -29,6 +29,7 @@ public class InfoTripActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> onBackPressed());
@@ -104,7 +105,7 @@ public class InfoTripActivity extends AppCompatActivity {
         });
 
         CardView AlbumPhotosCard = findViewById(R.id.album_photos);
-        travelAgendaCard.setOnClickListener(new View.OnClickListener() {
+        AlbumPhotosCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(InfoTripActivity.this, AlbumPhotoActivity.class);
