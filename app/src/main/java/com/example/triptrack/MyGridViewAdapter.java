@@ -15,13 +15,27 @@ public class MyGridViewAdapter extends BaseAdapter {
     private Context context;
     private List<Bitmap> imageList;
 
+    private List<String> fileNames;
+
+
     public MyGridViewAdapter(Context context, List<Bitmap> imageList) {
         this.context = context;
         this.imageList = imageList != null ? imageList : new ArrayList<Bitmap>();
+        this.fileNames = new ArrayList<>();
 
     }
-    public void add(Bitmap image) {
+    public void add(Bitmap image, String fileName) {
         imageList.add(image);
+        fileNames.add(fileName);
+    }
+
+    public void remove(int position) {
+        imageList.remove(position);
+        fileNames.remove(position);
+    }
+
+    public String getFileName(int position) {
+        return fileNames.get(position);
     }
 
     @Override
@@ -56,5 +70,10 @@ public class MyGridViewAdapter extends BaseAdapter {
         return imageView;
     }
 
+
+    public void clear() {
+        imageList.clear();
+        notifyDataSetChanged();
+    }
 }
 

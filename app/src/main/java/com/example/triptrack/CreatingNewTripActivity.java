@@ -1,28 +1,27 @@
 package com.example.triptrack;
 
-import android.content.DialogInterface;
+import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.*;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class CreatingNewTripActivity extends AppCompatActivity {
+
+    private Calendar departureCalendar;
+    private Calendar returnCalendar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,67 +31,59 @@ public class CreatingNewTripActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> onBackPressed());
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(
-                new BottomNavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        // Obtener el ID del item seleccionado
-                        int itemId = item.getItemId();
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            // Obtener el ID del item seleccionado
+            int itemId = item.getItemId();
 
-                        // Realizar acciones basadas en el item seleccionado
-                        switch (itemId) {
-                            case R.id.nav_my_trips:
-                                // Acción para la pestaña "Buscar"
-                                // Ejemplo: iniciar la actividad correspondiente
-                                Intent mainIntent = new Intent(CreatingNewTripActivity.this, MainActivity.class);
-                                startActivity(mainIntent);
-                                return true;
-                            case R.id.bottom_nav_world:
-                                // Acción para la pestaña "Buscar"
-                                // Ejemplo: iniciar la actividad correspondiente
-                                Intent searchIntent = new Intent(CreatingNewTripActivity.this, MapamundiActivity.class);
-                                startActivity(searchIntent);
-                                return true;
-                            case R.id.bottom_nav_settings:
-                                // Acción para la pestaña "Perfil"
-                                // Ejemplo: iniciar la actividad correspondiente
-                                Intent profileIntent = new Intent(CreatingNewTripActivity.this, ConfigurationActivity.class);
-                                startActivity(profileIntent);
-                                return true;
-                        }
+            // Realizar acciones basadas en el item seleccionado
+            if (itemId == R.id.nav_my_trips) {
+                // Acción para la pestaña "Buscar"
+                // Ejemplo: iniciar la actividad correspondiente
+                Intent mainIntent = new Intent(CreatingNewTripActivity.this, MainActivity.class);
+                startActivity(mainIntent);
+                return true;
+            } else if (itemId == R.id.bottom_nav_world) {
+                // Acción para la pestaña "Buscar"
+                // Ejemplo: iniciar la actividad correspondiente
+                Intent searchIntent = new Intent(CreatingNewTripActivity.this, MapamundiActivity.class);
+                startActivity(searchIntent);
+                return true;
+            } else if (itemId == R.id.bottom_nav_settings) {
+                // Acción para la pestaña "Perfil"
+                // Ejemplo: iniciar la actividad correspondiente
+                Intent profileIntent = new Intent(CreatingNewTripActivity.this, ConfigurationActivity.class);
+                startActivity(profileIntent);
+                return true;
+            }
 
-                        return false;
-                    }
-                });
+            return false;
+        });
 
+        ImageButton calendarDepartureButton = findViewById(R.id.calendarDeparture);
+        calendarDepartureButton.setOnClickListener(v -> showDatePickerDialog(true));
+
+        ImageButton calendarReturnButton = findViewById(R.id.calendarReturn);
+        calendarReturnButton.setOnClickListener(v -> showDatePickerDialog(false));
 
         saveTripButton = findViewById(R.id.save_trip_button);
-        saveTripButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new AlertDialog.Builder(CreatingNewTripActivity.this)
-                        .setTitle("Confirmar viaje")
-                        .setMessage("¿Desea guardar este viaje?")
-                        .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // El usuario confirmó, guarda los datos del formulario en la colección "viajes"
-                                saveTrip();
-                            }
-                        })
-                        .setNegativeButton("No", null)
-                        .show();
-            }
-        });
+        saveTripButton.setOnClickListener(v -> new AlertDialog.Builder(CreatingNewTripActivity.this)
+                .setTitle("Confirmar viaje")
+                .setMessage("¿Desea guardar este viaje?")
+                .setPositiveButton("Sí", (dialog, which) -> {
+                    // El usuario confirmó, guarda los datos del formulario en la colección "viajes"
+                    saveTrip();
+                })
+                .setNegativeButton("No", null)
+                .show());
     }
 
-    private void saveTrip() {
+        private void saveTrip() {
         EditText destinationEditText = findViewById(R.id.destination_edit_text);
         EditText departureDateEditText = findViewById(R.id.departure_date_edit_text);
         EditText returnDateEditText = findViewById(R.id.return_date_edit_text);
@@ -115,10 +106,30 @@ public class CreatingNewTripActivity extends AppCompatActivity {
         if (departureDate.isEmpty()) {
             departureDateEditText.setError("Este campo es obligatorio");
             hasEmptyFields = true;
+        } else {
+            // Verificar si la fecha de ida está en el formato correcto
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+            dateFormat.setLenient(false);
+            try {
+                dateFormat.parse(departureDate);
+            } catch (ParseException e) {
+                departureDateEditText.setError("Ingrese una fecha válida en el formato DD/MM/YYYY");
+                hasEmptyFields = true;
+            }
         }
         if (returnDate.isEmpty()) {
             returnDateEditText.setError("Este campo es obligatorio");
             hasEmptyFields = true;
+        } else {
+            // Verificar si la fecha de vuelta está en el formato correcto
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+            dateFormat.setLenient(false);
+            try {
+                dateFormat.parse(returnDate);
+            } catch (ParseException e) {
+                returnDateEditText.setError("Ingrese una fecha válida en el formato DD/MM/YYYY");
+                hasEmptyFields = true;
+            }
         }
         if (peopleCount.isEmpty()) {
             peopleCountEditText.setError("Este campo es obligatorio");
@@ -136,7 +147,6 @@ public class CreatingNewTripActivity extends AppCompatActivity {
             hasEmptyFields = true;
         }
 
-
         if (hasEmptyFields) {
             // Mostrar un mensaje al usuario
             Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
@@ -151,45 +161,76 @@ public class CreatingNewTripActivity extends AppCompatActivity {
         trip.put("peopleCount", peopleCount);
         trip.put("price", price);
 
-        // Agregar un nuevo documento a la colección "viajes" con los datos del formulario
+
+    // Agregar un nuevo documento a la colección "viajes" con los datos del formulario
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("viajes")
                 .add(trip)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        // El viaje se guardó correctamente
-                        Toast.makeText(CreatingNewTripActivity.this, "Viaje guardado", Toast.LENGTH_SHORT).show();
+                .addOnSuccessListener(documentReference -> {
+                    // El viaje se guardó correctamente
+                    Toast.makeText(CreatingNewTripActivity.this, "Viaje guardado", Toast.LENGTH_SHORT).show();
 
-                        // Obtener el ID del documento de Firestore
-                        String tripId = documentReference.getId();
+                    // Obtener el ID del documento de Firestore
+                    String tripId = documentReference.getId();
 
-                        // Actualizar el documento para agregar el campo tripId
-                        Map<String, Object> update = new HashMap<>();
-                        update.put("tripId", tripId);
-                        documentReference.update(update);
+                    // Actualizar el documento para agregar el campo tripId
+                    Map<String, Object> update = new HashMap<>();
+                    update.put("tripId", tripId);
+                    documentReference.update(update);
 
-                        Intent intent = new Intent(CreatingNewTripActivity.this, MainActivity.class);
-                        intent.putExtra("destination", destination);
-                        intent.putExtra("departureDate", departureDate);
-                        intent.putExtra("returnDate", returnDate);
-                        intent.putExtra("peopleCount", peopleCount);
-                        intent.putExtra("price", price);
+                    //Actualizar el documento para agregar el campo "status"
+                    Map<String, Object> update2 = new HashMap<>();
+                    update2.put("status", "Activo");
+                    documentReference.update(update2);
 
-                        // Pasar el ID del viaje a la actividad MainActivity
-                        intent.putExtra("tripId", tripId);
 
-                        startActivity(intent);
-                    }
+                    Intent intent = new Intent(CreatingNewTripActivity.this, MainActivity.class);
+                    intent.putExtra("destination", destination);
+                    intent.putExtra("departureDate", departureCalendar);
+                    intent.putExtra("returnDate", returnCalendar);
+                    intent.putExtra("peopleCount", peopleCount);
+                    intent.putExtra("price", price);
 
+                    // Pasar el ID del viaje a la actividad MainActivity
+                    intent.putExtra("tripId", tripId);
+
+                    startActivity(intent);
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Ocurrió un error al guardar el viaje
-                        Toast.makeText(CreatingNewTripActivity.this, "Error al guardar el viaje", Toast.LENGTH_SHORT).show();
-                    }
+                .addOnFailureListener(e -> {
+                    // Ocurrió un error al guardar el viaje
+                    Toast.makeText(CreatingNewTripActivity.this, "Error al guardar el viaje", Toast.LENGTH_SHORT).show();
                 });
     }
 
+    private void showDatePickerDialog(final boolean isDeparture) {
+        // Obtener la fecha actual
+        Calendar calendar = Calendar.getInstance();
+
+        // Crear un DatePickerDialog y mostrarlo
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+            // Crear un objeto Calendar con la fecha seleccionada
+            Calendar selectedDate = Calendar.getInstance();
+            selectedDate.set(year, month, dayOfMonth);
+
+            // Guardar la fecha seleccionada en la variable correspondiente
+            if (isDeparture) {
+                departureCalendar = selectedDate;
+
+                // Mostrar la fecha seleccionada en el campo de texto correspondiente
+                EditText departureDateEditText = findViewById(R.id.departure_date_edit_text);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                departureDateEditText.setText(dateFormat.format(departureCalendar.getTime()));
+            } else {
+                returnCalendar = selectedDate;
+
+                // Mostrar la fecha seleccionada en el campo de texto correspondiente
+                EditText returnDateEditText = findViewById(R.id.return_date_edit_text);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+                returnDateEditText.setText(dateFormat.format(returnCalendar.getTime()));
+            }
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+        datePickerDialog.show();
     }
+
+
+}

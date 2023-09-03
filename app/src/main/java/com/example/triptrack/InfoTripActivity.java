@@ -4,19 +4,17 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.view.MenuItem;
+import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.io.FileNotFoundException;
+import java.util.Objects;
 
 public class InfoTripActivity extends AppCompatActivity {
 
@@ -29,7 +27,7 @@ public class InfoTripActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> onBackPressed());
@@ -44,7 +42,7 @@ public class InfoTripActivity extends AppCompatActivity {
 
 
         // Obtener una referencia al CardView
-        CardView cardView = findViewById(R.id.card_view);
+        findViewById(R.id.card_view);
 
 // Obtener las referencias a los TextViews
         TextView destinationText = findViewById(R.id.destination_text);
@@ -64,88 +62,69 @@ public class InfoTripActivity extends AppCompatActivity {
 
         // En el método onClick del botón import_photo_button
         ImageButton importPhotoButton = findViewById(R.id.import_photo_button);
-        importPhotoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/*");
-                startActivityForResult(intent, PICK_IMAGE_REQUEST);
-            }
+        importPhotoButton.setOnClickListener(v -> {
+            Intent intent15 = new Intent(Intent.ACTION_PICK);
+            intent15.setType("image/*");
+            startActivityForResult(intent15, PICK_IMAGE_REQUEST);
         });
 
         CardView importDocumentsCard = findViewById(R.id.import_documents);
-        importDocumentsCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(InfoTripActivity.this, ImportDocumentsActivity.class);
-                // Iniciar la actividad ImportDocumentsActivity y pasar solo el campo tripId
-                intent.putExtra("tripId", tripId);
-                startActivity(intent);
-            }
+        importDocumentsCard.setOnClickListener(v -> {
+            Intent intent1 = new Intent(InfoTripActivity.this, ImportDocumentsActivity.class);
+            // Iniciar la actividad ImportDocumentsActivity y pasar solo el campo tripId
+            intent1.putExtra("tripId", tripId);
+            startActivity(intent1);
         });
 
         CardView expenseCalculationCard = findViewById(R.id.expense_calculation);
-        expenseCalculationCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(InfoTripActivity.this, ExpenseCalculationActivity.class);
-                intent.putExtra("tripId", tripId);
-                startActivity(intent);
-            }
+        expenseCalculationCard.setOnClickListener(v -> {
+            Intent intent12 = new Intent(InfoTripActivity.this, ExpenseCalculationActivity.class);
+            intent12.putExtra("tripId", tripId);
+            startActivity(intent12);
         });
 
         CardView travelAgendaCard = findViewById(R.id.travel_agenda);
-        travelAgendaCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(InfoTripActivity.this, TravelAgendaActivity.class);
-                intent.putExtra("tripId", tripId);
-                startActivity(intent);
-            }
+        travelAgendaCard.setOnClickListener(v -> {
+            Intent intent13 = new Intent(InfoTripActivity.this, TravelAgendaActivity.class);
+            intent13.putExtra("tripId", tripId);
+            startActivity(intent13);
         });
 
         CardView AlbumPhotosCard = findViewById(R.id.album_photos);
-        AlbumPhotosCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(InfoTripActivity.this, AlbumPhotoActivity.class);
-                intent.putExtra("tripId", tripId);
-                startActivity(intent);
-            }
+        AlbumPhotosCard.setOnClickListener(v -> {
+            Intent intent14 = new Intent(InfoTripActivity.this, AlbumPhotoActivity.class);
+            intent14.putExtra("tripId", tripId);
+            startActivity(intent14);
         });
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(
-                new BottomNavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        // Obtener el ID del item seleccionado
-                        int itemId = item.getItemId();
+        bottomNavigationView.setOnItemSelectedListener(
+                (BottomNavigationView.OnNavigationItemSelectedListener) item -> {
+                    // Obtener el ID del item seleccionado
+                    int itemId = item.getItemId();
 
-                        // Realizar acciones basadas en el item seleccionado
-                        switch (itemId) {
-                            case R.id.nav_my_trips:
-                                // Acción para la pestaña "Buscar"
-                                // Ejemplo: iniciar la actividad correspondiente
-                                Intent mainIntent = new Intent(InfoTripActivity.this, MainActivity.class);
-                                startActivity(mainIntent);
-                                return true;
-                            case R.id.bottom_nav_world:
-                                // Acción para la pestaña "Buscar"
-                                // Ejemplo: iniciar la actividad correspondiente
-                                Intent searchIntent = new Intent(InfoTripActivity.this, MapamundiActivity.class);
-                                startActivity(searchIntent);
-                                return true;
-                            case R.id.bottom_nav_settings:
-                                // Acción para la pestaña "Perfil"
-                                // Ejemplo: iniciar la actividad correspondiente
-                                Intent profileIntent = new Intent(InfoTripActivity.this, ConfigurationActivity.class);
-                                startActivity(profileIntent);
-                                return true;
-                        }
-
-                        return false;
+                    // Realizar acciones basadas en el item seleccionado
+                    if (itemId == R.id.nav_my_trips) {
+                        // Acción para la pestaña "Buscar"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent mainIntent = new Intent(this, MainActivity.class);
+                        startActivity(mainIntent);
+                        return true;
+                    } else if (itemId == R.id.bottom_nav_world) {
+                        // Acción para la pestaña "Buscar"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent searchIntent = new Intent(this, MapamundiActivity.class);
+                        startActivity(searchIntent);
+                        return true;
+                    } else if (itemId == R.id.bottom_nav_settings) {
+                        // Acción para la pestaña "Perfil"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent profileIntent = new Intent(this, ConfigurationActivity.class);
+                        startActivity(profileIntent);
+                        return true;
                     }
+
+                    return false;
                 });
 
     }

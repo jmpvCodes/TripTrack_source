@@ -79,12 +79,32 @@
 				android:text="Fecha de ida"
 				android:textSize="18sp" />
 
-		<EditText
-				android:id="@+id/departure_date_edit_text"
-				android:layout_marginRight="20dp"
-				android:layout_marginLeft="20dp"
+		<FrameLayout
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content" />
+				android:layout_height="wrap_content">
+
+			<EditText
+					android:id="@+id/departure_date_edit_text"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:hint="DD/MM/YYYY"
+					android:layout_marginRight="20dp"
+					android:layout_marginLeft="20dp"
+					android:minHeight="48dp"/>
+
+			<ImageButton
+					android:id="@+id/calendarDeparture"
+					android:layout_width="30dp"
+					android:layout_height="30dp"
+					android:layout_marginRight="30dp"
+					android:layout_marginBottom="10dp"
+					android:scaleType="centerInside"
+					android:background="@color/white"
+					android:src="@drawable/calendar"
+					android:layout_gravity="right|center_vertical" />
+
+		</FrameLayout>
+
 
 		<TextView
 				android:layout_width="wrap_content"
@@ -94,12 +114,31 @@
 				android:text="Fecha de vuelta"
 				android:textSize="18sp" />
 
-		<EditText
-				android:id="@+id/return_date_edit_text"
-				android:layout_marginRight="20dp"
-				android:layout_marginLeft="20dp"
+		<FrameLayout
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content" />
+				android:layout_height="wrap_content">
+
+			<EditText
+					android:id="@+id/return_date_edit_text"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:hint="DD/MM/YYYY"
+					android:layout_marginRight="20dp"
+					android:layout_marginLeft="20dp"
+					android:minHeight="48dp"/>
+
+			<ImageButton
+					android:id="@+id/calendarReturn"
+					android:layout_width="30dp"
+					android:layout_height="30dp"
+					android:layout_marginRight="30dp"
+					android:layout_marginBottom="10dp"
+					android:src="@drawable/calendar"
+					android:scaleType="centerInside"
+					android:background="@color/white"
+					android:layout_gravity="right|center_vertical" />
+
+		</FrameLayout>
 
 		<TextView
 				android:layout_width="wrap_content"

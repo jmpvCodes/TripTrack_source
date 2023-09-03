@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -18,16 +17,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class LoginActivity extends AppCompatActivity {
@@ -63,49 +61,36 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        otherUsersText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        otherUsersText.setOnClickListener(v -> {
 
-                Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+            Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
 
-                Pair[] pairs = new Pair[7];
-                pairs[0] = new Pair<View, String>(logoImageView, "logoImageTrans");
-                pairs[1] = new Pair<View, String>(welcomeLabel, "welcomeTrans");
-                pairs[2] = new Pair<View, String>(headLabel, "headTextTrans");
-                pairs[3] = new Pair<View, String>(nameText, "nameTextTrans");
-                pairs[4] = new Pair<View, String>(passwordText, "passwordTextTrans");
-                pairs[5] = new Pair<View, String>(SignUpButton, "signUpButtonTrans");
-                pairs[6] = new Pair<View, String>(otherUsersText, "otherUsersTrans");
+            Pair[] pairs = new Pair[7];
+            pairs[0] = new Pair<View, String>(logoImageView, "logoImageTrans");
+            pairs[1] = new Pair<View, String>(welcomeLabel, "welcomeTrans");
+            pairs[2] = new Pair<View, String>(headLabel, "headTextTrans");
+            pairs[3] = new Pair<View, String>(nameText, "nameTextTrans");
+            pairs[4] = new Pair<View, String>(passwordText, "passwordTextTrans");
+            pairs[5] = new Pair<View, String>(SignUpButton, "signUpButtonTrans");
+            pairs[6] = new Pair<View, String>(otherUsersText, "otherUsersTrans");
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(LoginActivity.this, pairs);
-                    startActivity(intent, options.toBundle());
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(LoginActivity.this, pairs);
+                startActivity(intent, options.toBundle());
 
-                } else {
+            } else {
 
-                    startActivity(intent);
-                    finish();
-                }
+                startActivity(intent);
+                finish();
             }
         });
 
-        SignUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                validate();
-            }
-        });
+        SignUpButton.setOnClickListener(v -> validate());
 
         signInButton = findViewById(R.id.loginGoogle);
 
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SignInWithGoogle();
-            }
-        });
+        signInButton.setOnClickListener(v -> SignInWithGoogle());
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.web_client_id))
@@ -143,17 +128,14 @@ public class LoginActivity extends AppCompatActivity {
 
         AuthCredential credencial = GoogleAuthProvider.getCredential(idToken,null);
         mAuth.signInWithCredential(credencial)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()){
-                            Intent intent = new Intent (LoginActivity.this, MainActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                        else{
-                            Toast.makeText(LoginActivity.this, "Fallo en iniciar la sesión. Inténtelo de nuevo.", Toast.LENGTH_LONG).show();
-                        }
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()){
+                        Intent intent = new Intent (LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                    else{
+                        Toast.makeText(LoginActivity.this, "Fallo en iniciar la sesión. Inténtelo de nuevo.", Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -161,8 +143,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private void validate(){
 
-        String email = emailEditText.getText().toString().trim();
-        String password = passwordEditText.getText().toString().trim();
+        String email = Objects.requireNonNull(emailEditText.getText()).toString().trim();
+        String password = Objects.requireNonNull(passwordEditText.getText()).toString().trim();
 
         if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailEditText.setError("Correo inválido!");
@@ -194,18 +176,15 @@ public class LoginActivity extends AppCompatActivity {
     private void startSession(String email, String password){
 
         mAuth.signInWithEmailAndPassword(email,password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()){
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()){
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
 
-                        else{
-                            Toast.makeText(LoginActivity.this, "Credenciales incorrectas. Intentalo de nuevo.", Toast.LENGTH_LONG).show();
-                        }
+                    else{
+                        Toast.makeText(LoginActivity.this, "Credenciales incorrectas. Intentalo de nuevo.", Toast.LENGTH_LONG).show();
                     }
                 });
 

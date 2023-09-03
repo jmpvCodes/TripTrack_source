@@ -3,7 +3,7 @@
 		  xmlns:tools="http://schemas.android.com/tools">
 
 	<uses-permission android:name="android.permission.INTERNET"/>
-	<uses-permission android:name="android.permission.GRANT_WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.GRANT_WRITE_EXTERNAL_STORAGE"/>
 
 	<application
 			android:allowBackup="true"
@@ -14,15 +14,21 @@
 			android:supportsRtl="true"
 			android:theme="@style/Theme.TripTrack"
 			tools:targetApi="31">
+		<activity
+				android:name=".FolderActivity"
+				android:exported="false"/>
+		<activity
+				android:name=".FinishedTripsActivity"
+				android:exported="false"/>
 
 		<provider
 				android:name="androidx.core.content.FileProvider"
-				android:authorities="${applicationId}.provider"
+				android:authorities="com.example.triptrack.provider"
 				android:exported="false"
 				android:grantUriPermissions="true">
 			<meta-data
 					android:name="android.support.FILE_PROVIDER_PATHS"
-					android:resource="@xml/file_paths" />
+					android:resource="@xml/file_paths"/>
 		</provider>
 
 		<activity

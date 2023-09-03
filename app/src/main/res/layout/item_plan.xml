@@ -24,12 +24,6 @@
 				android:layout_height="wrap_content"
 			 />
 
-		<ImageView
-				android:id="@+id/priorityImageView"
-				android:layout_width="20dp"
-				android:layout_margin="10dp"
-				android:layout_height="20dp" />
-
 		<HorizontalScrollView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content">
@@ -43,6 +37,22 @@
 			/>
 
 		</HorizontalScrollView>
+
+		<ImageView
+				android:id="@+id/edit_icon"
+				android:layout_width="15dp"
+				android:layout_height="15dp"
+				android:layout_marginTop="20dp"
+				android:layout_marginRight="20dp"
+				android:src="@drawable/edit_icon" />
+
+		<ImageView
+				android:id="@+id/delete_icon"
+				android:layout_width="15dp"
+				android:layout_height="15dp"
+				android:layout_marginTop="20dp"
+				android:layout_marginRight="20dp"
+				android:src="@drawable/delete_icon" />
 
 	</LinearLayout>
 

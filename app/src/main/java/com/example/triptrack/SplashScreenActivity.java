@@ -49,46 +49,43 @@ public class SplashScreenActivity extends AppCompatActivity {
 
 
         //Creación de un hilo que pasados 4sg inicializará la siguiente Activity.
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
+        new Handler().postDelayed(() -> {
 
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(SplashScreenActivity.this);
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            GoogleSignIn.getLastSignedInAccount(SplashScreenActivity.this);
 
-                if (user == null) {
+            if (user == null) {
 
-                    Intent intent = new Intent(SplashScreenActivity.this, SignUpActivity.class);
+                Intent intent = new Intent(SplashScreenActivity.this, SignUpActivity.class);
+                startActivity(intent);
+                finish();
+
+            } else {
+                Intent intent = new Intent(SplashScreenActivity.this, LoginActivity.class);
+
+            /*Se crea un Array de pares para crear una transición que se solape con la siguiente activity.
+            Donde el primer elemento es el objeto que se coge de la splash screen y el segundo es donde se coloca
+            en la siguiente activity.
+            */
+                Pair[] pairs = new Pair[2];
+                pairs[0] = new Pair<View, String>(logoImageView, "logoImageTrans");
+                pairs[1] = new Pair<View, String>(juanmanuelTextView, "textTrans");
+
+                //Se realiza una verifiación de la versión ya que versiones anteriores a Lollipop no podría realizar
+                //dicho solapamiento.
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(SplashScreenActivity.this, pairs);
+                    startActivity(intent, options.toBundle());
+
+                } else {
                     startActivity(intent);
                     finish();
 
-                } else {
-                    Intent intent = new Intent(SplashScreenActivity.this, LoginActivity.class);
-
-                /*Se crea un Array de pares para crear una transición que se solape con la siguiente activity.
-                Donde el primer elemento es el objeto que se coge de la splash screen y el segundo es donde se coloca
-                en la siguiente activity.
-                */
-                    Pair[] pairs = new Pair[2];
-                    pairs[0] = new Pair<View, String>(logoImageView, "logoImageTrans");
-                    pairs[1] = new Pair<View, String>(juanmanuelTextView, "textTrans");
-
-                    //Se realiza una verifiación de la versión ya que versiones anteriores a Lollipop no podría realizar
-                    //dicho solapamiento.
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
-                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(SplashScreenActivity.this, pairs);
-                        startActivity(intent, options.toBundle());
-
-                    } else {
-                        startActivity(intent);
-                        finish();
-
-                    }
                 }
-
             }
+
         }, 4000);
     }
 }

@@ -10,7 +10,9 @@
 	<color name="colorPrimary">#154484</color>
 	<color name="colorAccent">#FFBD1F</color>
 	<color name="mainGreen">#056832</color>
-	<color name="example_color">#C7C5C4</color>
+	<color name="example_color">#FFE1E1E1</color>
 	<color name="verde_claro">#20B2AA</color>
+	<color name="light_yellow">#FFFFE0</color>
+
 
 </resources>

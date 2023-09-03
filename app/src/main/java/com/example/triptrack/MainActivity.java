@@ -1,37 +1,42 @@
 package com.example.triptrack;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
-    private CardView createTripCard;
 
     private TextView list_trips_text;
 
+    @SuppressLint({"NonConstantResourceId", "CutPasteId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,40 +45,41 @@ public class MainActivity extends AppCompatActivity {
         // Configurar la Toolbar (AppBar)
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu); // Icono para abrir el drawer
         }
         CardView warningCard = findViewById(R.id.warning_no_trips);
+        warningCard.setVisibility(View.GONE);
+
         list_trips_text = findViewById(R.id.list_trips_text);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("viajes")
+                .whereNotEqualTo("status", "finalizado")
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            List<DocumentSnapshot> documents = task.getResult().getDocuments();
-                            if (documents.size() > 0) {
-                                // Hay viajes en la colección "viajes"
-                                // Mostrar los viajes
-                                warningCard.setVisibility(View.GONE);
-                                list_trips_text.setVisibility(View.VISIBLE);
-                                loadTrips();
-                            } else {
-                                // No hay viajes en la colección "viajes"
-                                // Mostrar el Card "warning_no_trips"
-                                warningCard.setVisibility(View.VISIBLE);
-
-                            }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                        if (documents.size() > 0) {
+                            // Hay viajes en la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
+                            warningCard.setVisibility(View.GONE);
+                            list_trips_text.setVisibility(View.VISIBLE);
+                            loadTrips();
                         } else {
-                            // Error al obtener los datos de la colección "viajes"
+                            // No hay viajes en la colección "viajes" que no tengan el atributo "status" con valor "finalizado"
+                            warningCard.setVisibility(View.VISIBLE);
+                            LottieAnimationView animationView = findViewById(R.id.animation_view);
+                            animationView.cancelAnimation();
+                            animationView.setVisibility(View.GONE);
                         }
-                    }
+                    }  // Error al obtener los datos de la colección "viajes"
+
                 });
+
+
 
 
         // Configurar el DrawerLayout
@@ -83,37 +89,67 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
+        // Configurar el NavigationView
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(item -> {
+            // Cerrar el DrawerLayout al seleccionar una opción
+            DrawerLayout drawer = findViewById(R.id.drawer_layout); // Utilizar el ID correcto del DrawerLayout
+            drawer.closeDrawer(GravityCompat.START);
+
+            // Manejar la selección de opciones del menú
+            switch (item.getItemId()) {
+                case R.id.nav_my_trips:
+                    // Iniciar la actividad FinishedTripsActivity al seleccionar la opción "Viajes finalizados"
+                    Intent intent = new Intent(MainActivity.this, FinishedTripsActivity.class);
+                    startActivity(intent);
+                    return true;
+                case R.id.nav_my_world:
+                    // Iniciar la actividad FinishedTripsActivity al seleccionar la opción "Viajes finalizados"
+                    Intent intentMapamundi = new Intent(MainActivity.this, MapamundiActivity.class);
+                    startActivity(intentMapamundi);
+                    return true;
+                case R.id.nav_settings:
+                    // Iniciar la actividad FinishedTripsActivity al seleccionar la opción "Viajes finalizados"
+                    Intent intentSettings = new Intent(MainActivity.this, ConfigurationActivity.class);
+                    startActivity(intentSettings);
+                    return true;
+
+
+            }
+
+            return false;
+        });
+
+
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(
-                new BottomNavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        // Obtener el ID del item seleccionado
-                        int itemId = item.getItemId();
+        bottomNavigationView.setOnItemSelectedListener(
+                item -> {
+                    // Obtener el ID del item seleccionado
+                    int itemId = item.getItemId();
 
-                        // Realizar acciones basadas en el item seleccionado
-                        switch (itemId) {
-                            case R.id.bottom_nav_world:
-                                // Acción para la pestaña "Buscar"
-                                // Ejemplo: iniciar la actividad correspondiente
-                                Intent searchIntent = new Intent(MainActivity.this, MapamundiActivity.class);
-                                startActivity(searchIntent);
-                                return true;
-                            case R.id.bottom_nav_settings:
-                                // Acción para la pestaña "Perfil"
-                                // Ejemplo: iniciar la actividad correspondiente
-                                Intent profileIntent = new Intent(MainActivity.this, ConfigurationActivity.class);
-                                startActivity(profileIntent);
-                                return true;
-                        }
-
-                        return false;
+                    // Realizar acciones basadas en el item seleccionado
+                    switch (itemId) {
+                        case R.id.bottom_nav_world:
+                            // Acción para la pestaña "Buscar"
+                            // Ejemplo: iniciar la actividad correspondiente
+                            Intent searchIntent = new Intent(MainActivity.this, MapamundiActivity.class);
+                            startActivity(searchIntent);
+                            return true;
+                        case R.id.bottom_nav_settings:
+                            // Acción para la pestaña "Perfil"
+                            // Ejemplo: iniciar la actividad correspondiente
+                            Intent profileIntent = new Intent(MainActivity.this, ConfigurationActivity.class);
+                            startActivity(profileIntent);
+                            return true;
                     }
+
+                    return false;
                 });
 
 
         // Configurar las Cards para crear un nuevo viaje y consultar un viaje
-        createTripCard = findViewById(R.id.create_trip_card);
+        CardView createTripCard = findViewById(R.id.create_trip_card);
         ImageView iconImageView = findViewById(R.id.new_trip);
         iconImageView.setImageResource(R.drawable.new_trip);
 
@@ -152,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressLint("ResourceAsColor")
     private void addTripCard(String destination, String departureDate, String returnDate, String peopleCount, String price, String tripId) {
         // Crear un nuevo CardView
         CardView tripCard = new CardView(this);
@@ -161,11 +198,11 @@ public class MainActivity extends AppCompatActivity {
         );
 
         int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30, getResources().getDisplayMetrics());
-        layoutParams.setMargins(margin, 30, margin, 20);
+        layoutParams.setMargins(margin, margin, margin, margin);
         tripCard.setLayoutParams(layoutParams);
         tripCard.setRadius(30);
         tripCard.setCardElevation(10);
-        tripCard.setCardBackgroundColor(getResources().getColor(R.color.example_color));
+        tripCard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.example_color));
 
         // Agregar el contenido del CardView
         LinearLayout cardContentLayout = new LinearLayout(this);
@@ -175,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
 
         TextView destinationText = new TextView(this);
         destinationText.setText(destination);
-        destinationText.setTextColor(getResources().getColor(R.color.black));
+        destinationText.setTextColor(ContextCompat.getColor(this, R.color.black));
         destinationText.setTextSize(30);
         destinationText.setPadding(0,0,0,50);
         cardContentLayout.addView(destinationText);
@@ -191,14 +228,14 @@ public class MainActivity extends AppCompatActivity {
         // Crear el TextView para la fecha de ida
         TextView departureDateText = new TextView(this);
         departureDateText.setText("Ida: " + departureDate);
-        departureDateText.setTextColor(getResources().getColor(R.color.black));
+        departureDateText.setTextColor(ContextCompat.getColor(this, R.color.black));
         departureDateText.setTextSize(18);
 
 // Crear el TextView para la fecha de vuelta
         TextView returnDateText = new TextView(this);
         returnDateText.setText("Vuelta: " + returnDate);
         returnDateText.setPadding(30,0,0,0);
-        returnDateText.setTextColor(getResources().getColor(R.color.black));
+        returnDateText.setTextColor(ContextCompat.getColor(this, R.color.black));
         returnDateText.setTextSize(18);
 
         // Agregar los TextViews al LinearLayout
@@ -210,13 +247,13 @@ public class MainActivity extends AppCompatActivity {
 
         TextView peopleCountText = new TextView(this);
         peopleCountText.setText(peopleCount + " Personas");
-        peopleCountText.setTextColor(getResources().getColor(R.color.black));
+        peopleCountText.setTextColor(ContextCompat.getColor(this, R.color.black));
         peopleCountText.setTextSize(18);
         cardContentLayout.addView(peopleCountText);
 
         TextView priceText = new TextView(this);
         priceText.setText(price + " €");
-        priceText.setTextColor(getResources().getColor(R.color.black));
+        priceText.setTextColor(ContextCompat.getColor(this, R.color.black));
         priceText.setTextSize(18);
         cardContentLayout.addView(priceText);
 
@@ -224,57 +261,281 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout tripsContainer = findViewById(R.id.trips_container);
         tripsContainer.addView(tripCard);
 
-        tripCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Aquí puedes agregar el código para abrir la nueva Activity
-                Intent intent = new Intent(MainActivity.this, InfoTripActivity.class);
-                // Puedes pasar información a la nueva Activity usando putExtra
-                intent.putExtra("destination", destination);
-                intent.putExtra("departureDate", departureDate);
-                intent.putExtra("returnDate", returnDate);
-                intent.putExtra("peopleCount", peopleCount);
-                intent.putExtra("price", price);
-                intent.putExtra("tripId",tripId);
-                startActivity(intent);
-            }
+        // Crear un LinearLayout con orientación horizontal
+        LinearLayout iconsLayout = new LinearLayout(this);
+        iconsLayout.setOrientation(LinearLayout.HORIZONTAL);
+        iconsLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        iconsLayout.setGravity(Gravity.END);
+
+
+        int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, getResources().getDisplayMetrics());
+
+
+        // Crear el ImageView para el icono de editar
+        ImageView editIcon = new ImageView(this);
+        editIcon.setImageResource(R.drawable.edit_icon);
+        editIcon.setBackgroundColor(Color.TRANSPARENT);
+        editIcon.setLayoutParams(new LinearLayout.LayoutParams(size, size));
+        editIcon.setPadding(10, 10, 10, 10);
+        iconsLayout.addView(editIcon);
+
+        // Agregar un OnClickListener al icono de editar
+        editIcon.setOnClickListener(v -> {
+            // Crear un AlertDialog.Builder para construir el AlertDialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("Editar viaje");
+
+            // Inflar el layout del formulario de edición del viaje
+            LayoutInflater inflater = getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.dialog_edit_trip, null);
+            builder.setView(dialogView);
+
+            // Obtener los campos del formulario
+            final EditText destinationEditText = dialogView.findViewById(R.id.destination_edit_text);
+            final EditText departureDateEditText = dialogView.findViewById(R.id.departure_date_edit_text);
+            final EditText returnDateEditText = dialogView.findViewById(R.id.return_date_edit_text);
+            final EditText peopleCountEditText = dialogView.findViewById(R.id.people_count_edit_text);
+            final EditText priceEditText = dialogView.findViewById(R.id.price_edit_text);
+
+            // Mostrar los datos del viaje en los campos del formulario
+            destinationEditText.setText(destination);
+            departureDateEditText.setText(departureDate);
+            returnDateEditText.setText(returnDate);
+            peopleCountEditText.setText(peopleCount);
+            priceEditText.setText(price);
+
+            // Agregar un botón "Guardar" al AlertDialog
+            builder.setPositiveButton("Guardar", (dialog, which) -> {
+                // Obtener los valores de los campos del formulario
+                String newDestination = destinationEditText.getText().toString();
+                String newDepartureDate = departureDateEditText.getText().toString();
+                String newReturnDate = returnDateEditText.getText().toString();
+                String newPeopleCount = peopleCountEditText.getText().toString();
+                String newPrice = priceEditText.getText().toString();
+
+                // Verificar si alguno de los campos está vacío
+                boolean hasEmptyFields = false;
+                if (newDestination.isEmpty()) {
+                    destinationEditText.setError("Este campo es obligatorio");
+                    hasEmptyFields = true;
+                }
+                if (newDepartureDate.isEmpty()) {
+                    departureDateEditText.setError("Este campo es obligatorio");
+                    hasEmptyFields = true;
+                }
+                if (newReturnDate.isEmpty()) {
+                    returnDateEditText.setError("Este campo es obligatorio");
+                    hasEmptyFields = true;
+                }
+                if (newPeopleCount.isEmpty()) {
+                    peopleCountEditText.setError("Este campo es obligatorio");
+                    hasEmptyFields = true;
+                } else if (!newPeopleCount.matches("\\d+")) {
+                    peopleCountEditText.setError("Ingrese un valor numérico válido");
+                    hasEmptyFields = true;
+                }
+
+                if (newPrice.isEmpty()) {
+                    priceEditText.setError("Este campo es obligatorio");
+                    hasEmptyFields = true;
+                } else if (!newPrice.matches("\\d+")) {
+                    priceEditText.setError("Ingrese un valor numérico válido");
+                    hasEmptyFields = true;
+                }
+
+                if (hasEmptyFields) {
+                    // Mostrar un mensaje al usuario
+                    Toast.makeText(MainActivity.this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Actualizar los datos del viaje en la base de datos de Firebase
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("viajes").document(tripId)
+                        .update(
+                                "destination", newDestination,
+                                "departureDate", newDepartureDate,
+                                "returnDate", newReturnDate,
+                                "peopleCount", newPeopleCount,
+                                "price", newPrice
+                        )
+                        .addOnSuccessListener(aVoid -> {
+                            // Los datos del viaje se actualizaron correctamente en la base de datos
+
+                            // Actualizar la visualización del viaje en la pantalla principal
+                            destinationText.setText(newDestination);
+                            departureDateText.setText("Ida: " + newDepartureDate);
+                            returnDateText.setText("Vuelta: " + newReturnDate);
+                            peopleCountText.setText(newPeopleCount + " Personas");
+                            priceText.setText(newPrice + " €");
+                        })
+                        .addOnFailureListener(e -> {
+                            // Ocurrió un error al intentar actualizar los datos del viaje en la base de datos
+                            Toast.makeText(MainActivity.this, "Error al actualizar el viaje", Toast.LENGTH_SHORT).show();
+                        });
+            });
+            // Agregar un botón "Cancelar" al AlertDialog
+            builder.setNegativeButton("Cancelar", (dialog, which) -> {
+                // Cerrar el AlertDialog sin guardar los cambios
+                dialog.dismiss();
+            });
+
+            // Mostrar el AlertDialog
+            builder.show();
         });
+
+        // Crear el ImageView para el icono de completar
+        ImageView doneIcon = new ImageView(this);
+        doneIcon.setImageResource(R.drawable.done_icon);
+        doneIcon.setBackgroundColor(Color.TRANSPARENT);
+        doneIcon.setLayoutParams(new LinearLayout.LayoutParams(size, size));
+        doneIcon.setPadding(10, 10, 10, 10);
+        iconsLayout.addView(doneIcon);
+        // Agregar un OnClickListener al icono de completar
+        doneIcon.setOnClickListener(v -> {
+            // Crear un AlertDialog para preguntar al usuario si ha finalizado el viaje
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("¿Ha finalizado este viaje?");
+            builder.setMessage("Si pulsa sobre \"Sí\" el viaje quedará guardado en \"Viajes finalizados\" y se quitará del menú principal. Además, quedará marcada la ubicación del viaje en tu Mapamundi.");
+            builder.setPositiveButton("Sí", (dialog, which) -> {
+                // TODO: Agregar código para completar el viaje y eliminarlo del menú principal
+
+                // Enviar un mensaje con el valor del destino a la actividad "MapamundiActivity"
+                Intent intent = new Intent("com.example.triptrack.DESTINATION_DATA");
+                intent.putExtra("destination", destination);
+                sendBroadcast(intent);
+
+
+
+                // Por ejemplo, puedes cambiar el estado del viaje a "finalizado" en la base de datos de Firestore
+                // y luego actualizar la interfaz de usuario para eliminar el Card del menú principal
+
+                // Cambiar el estado del viaje a "finalizado" en la base de datos de Firestore
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                DocumentReference tripRef = db.collection("viajes").document(tripId);
+                db.collection("viajes").document(tripId);
+                tripRef.update("status", "finalizado")
+                        .addOnSuccessListener(aVoid -> {
+                            // Eliminar el CardView correspondiente al viaje de la pantalla principal
+                            @SuppressLint("CutPasteId") LinearLayout tripsContainer12 = findViewById(R.id.trips_container);
+                            tripsContainer12.removeView(tripCard);
+
+                            // Enviar un mensaje con los datos del viaje a la actividad "FinishedTripsActivity"
+                            Intent intent2 = new Intent("com.example.triptrack.TRIP_DATA");
+                            intent2.putExtra("destination", destination);
+                            intent2.putExtra("departureDate", departureDate);
+                            intent2.putExtra("returnDate", returnDate);
+                            intent2.putExtra("peopleCount", peopleCount);
+                            intent2.putExtra("price", price);
+                            intent2.putExtra("tripId",tripId);
+                            sendBroadcast(intent2);
+
+
+                            Toast.makeText(MainActivity.this, "Cargado en \"Viajes finalizados\"", Toast.LENGTH_SHORT).show();
+                        });
+            });
+
+            builder.setNegativeButton("No", null);
+            builder.show();
+        });
+
+
+        // Crear el ImageView para el icono de eliminar
+        ImageView deleteIcon = new ImageView(this);
+        deleteIcon.setImageResource(R.drawable.delete_icon);
+        deleteIcon.setBackgroundColor(Color.TRANSPARENT);
+        deleteIcon.setLayoutParams(new LinearLayout.LayoutParams(size, size));
+        deleteIcon.setPadding(10, 10, 10, 10);
+        iconsLayout.addView(deleteIcon);
+
+        // Agregar un OnClickListener al icono de eliminar
+        deleteIcon.setOnClickListener(v -> {
+            // Mostrar un AlertDialog para confirmar la eliminación del viaje
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("Eliminar viaje")
+                    .setMessage("¿Está seguro de eliminar este viaje?")
+                    .setPositiveButton("Sí", (dialog, which) -> {
+
+                        // Eliminar el viaje de la base de datos de Firebase
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        db.collection("viajes").document(tripId)
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
+
+                                    // Eliminar el CardView correspondiente al viaje de la pantalla principal
+                                    @SuppressLint("CutPasteId") LinearLayout tripsContainer1 = findViewById(R.id.trips_container);
+                                    tripsContainer1.removeView(tripCard);
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Ocurrió un error al intentar eliminar el viaje de la base de datos
+                                    Toast.makeText(MainActivity.this, "Error al eliminar el viaje", Toast.LENGTH_SHORT).show();
+                                });
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        });
+
+
+
+// Agregar el LinearLayout al CardView
+        cardContentLayout.addView(iconsLayout);
+
+        tripCard.setOnClickListener(view -> {
+            // Aquí puedes agregar el código para abrir la nueva Activity
+            Intent intent = new Intent(MainActivity.this, InfoTripActivity.class);
+            // Puedes pasar información a la nueva Activity usando putExtra
+            intent.putExtra("destination", destination);
+            intent.putExtra("departureDate", departureDate);
+            intent.putExtra("returnDate", returnDate);
+            intent.putExtra("peopleCount", peopleCount);
+            intent.putExtra("price", price);
+            intent.putExtra("tripId",tripId);
+            startActivity(intent);
+        });
+
     }
 
-
-
-        private void loadTrips() {
+    private void loadTrips() {
         // Obtener una referencia a la base de datos
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Obtener todos los documentos de la colección "viajes"
+        // Mostrar la animación de Lottie
+        LottieAnimationView animationView = findViewById(R.id.animation_view);
+        animationView.playAnimation();
+
+        // Obtener todos los documentos de la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
         db.collection("viajes")
+                .whereNotEqualTo("status", "finalizado")
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            // Limpiar el contenedor de viajes
-                            LinearLayout tripsContainer = findViewById(R.id.trips_container);
-                            tripsContainer.removeAllViews();
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Limpiar el contenedor de viajes
+                        LinearLayout tripsContainer = findViewById(R.id.trips_container);
+                        tripsContainer.removeAllViews();
+                        // Detener la animación de Lottie
+                        animationView.cancelAnimation();
+                        animationView.setVisibility(View.GONE);
 
-                            // Recorrer todos los documentos y agregar un CardView para cada uno
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                String destination = document.getString("destination");
-                                String departureDate = document.getString("departureDate");
-                                String returnDate = document.getString("returnDate");
-                                String peopleCount = document.getString("peopleCount");
-                                String price = document.getString("price");
-                                String tripId = document.getString("tripId");
+                        // Recorrer todos los documentos y agregar un CardView para cada uno
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String destination = document.getString("destination");
+                            String departureDate = document.getString("departureDate");
+                            String returnDate = document.getString("returnDate");
+                            String peopleCount = document.getString("peopleCount");
+                            String price = document.getString("price");
+                            String tripId = document.getString("tripId");
 
-                                addTripCard(destination, departureDate, returnDate, peopleCount, price, tripId);
-                            }
-                        } else {
-                            // Ocurrió un error al obtener los viajes
-                            Toast.makeText(MainActivity.this, "Error al cargar los viajes", Toast.LENGTH_SHORT).show();
+                            addTripCard(destination, departureDate, returnDate, peopleCount, price, tripId);
                         }
+                    } else {
+                        // Ocurrió un error al obtener los viajes
+                        Toast.makeText(MainActivity.this, "Error al cargar los viajes", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
+
 
 }

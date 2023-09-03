@@ -4,14 +4,10 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.OpenableColumns;
-import android.util.Log;
-import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,15 +16,14 @@ import androidx.core.content.FileProvider;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ImportDocumentsActivity extends AppCompatActivity {
 
-    private Button importButton;
     private RadioGroup documentTypeRadioGroup;
     private static final int READ_REQUEST_CODE = 42;
     private String selectedMimeType;
 
-    private ListView documentListView;
     private DocumentAdapter documentAdapter;
 
     @Override
@@ -38,17 +33,17 @@ public class ImportDocumentsActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> onBackPressed());
 
         documentTypeRadioGroup = findViewById(R.id.document_type_radio_group);
 
-        importButton = findViewById(R.id.import_button);
+        Button importButton = findViewById(R.id.import_button);
         importButton.setOnClickListener(v -> performFileSearch());
 
-        documentListView = findViewById(R.id.document_list_view);
+        ListView documentListView = findViewById(R.id.document_list_view);
         documentAdapter = new DocumentAdapter(this, new ArrayList<>());
         documentListView.setAdapter(documentAdapter);
 
@@ -67,17 +62,14 @@ public class ImportDocumentsActivity extends AppCompatActivity {
             documentAdapter.notifyDataSetChanged();
         }
 
-        documentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Document document = documentAdapter.getItem(position);
-                File file = new File(document.getPath());
-                Uri uri = FileProvider.getUriForFile(ImportDocumentsActivity.this, BuildConfig.APPLICATION_ID + ".provider", file);
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(uri, getMimeType(file));
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivity(intent);
-            }
+        documentListView.setOnItemClickListener((parent, view, position, id) -> {
+            Document document = documentAdapter.getItem(position);
+            File file = new File(document.getPath());
+            Uri uri = FileProvider.getUriForFile(ImportDocumentsActivity.this, BuildConfig.APPLICATION_ID + ".provider", file);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri, getMimeType(file));
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(intent);
         });
     }
         private String getMimeType (File file){
@@ -128,7 +120,7 @@ public class ImportDocumentsActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         super.onActivityResult(requestCode, resultCode, resultData);
         if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Uri uri = null;
+            Uri uri;
             if (resultData != null) {
                 uri = resultData.getData();
 

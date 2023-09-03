@@ -1,17 +1,24 @@
 package com.example.triptrack;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.*;
+import android.os.Looper;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.tooltip.Tooltip;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,11 +60,12 @@ public class BudgetTabFragment extends Fragment {
         expenseConceptEditText = rootView.findViewById(R.id.expense_concept_edittext);
         addExpenseButton = rootView.findViewById(R.id.add_expense_button);
         ListView expensesListView = rootView.findViewById(R.id.expenses_listview);
+        Context context = getActivity();
 
         // Leer el valor del presupuesto guardado en el archivo de texto
         assert getArguments() != null;
         String tripId = getArguments().getString("tripId");
-        File directory = new File(getActivity().getFilesDir(), "Presupuesto");
+        File directory = new File(requireActivity().getFilesDir(), "Presupuesto");
         File tripDirectory = new File(directory, tripId);
         File file = new File(tripDirectory, "budget.txt");
         boolean budgetFileExists = file.exists();
@@ -66,7 +74,7 @@ public class BudgetTabFragment extends Fragment {
                 byte[] buffer = new byte[(int) file.length()];
                 inputStream.read(buffer);
                 String budgetText = new String(buffer);
-                budgetDisplay.setText(budgetText + "€");
+                budgetDisplay.setText(getString(R.string.budget_text, budgetText));
                 budgetDisplay.setVisibility(View.VISIBLE);
 
                 // Inicializar la variable budget con el valor leído del archivo de texto
@@ -105,22 +113,19 @@ public class BudgetTabFragment extends Fragment {
             expenseAmountEditText.setVisibility(View.GONE);
             expenseConceptEditText.setVisibility(View.GONE);
             addExpenseButton.setVisibility(View.GONE);
+            assert context != null;
             Tooltip tooltip = new Tooltip.Builder(budgetEditText)
                     .setText("Establezca aquí el presupuesto que espera gastar durante el viaje")
-                    .setBackgroundColor(getResources().getColor(R.color.verde_claro))
-                    .setTextColor(getResources().getColor(R.color.white))
+                    .setBackgroundColor(ContextCompat.getColor(context, R.color.verde_claro))
+                    .setTextColor(ContextCompat.getColor(context, R.color.white))
+
                     .setGravity(Gravity.BOTTOM)
                     .setCornerRadius(8f)
                     .setDismissOnClick(true)
                     .show();
 
             // Programar la eliminación del mensaje después de 5 segundos
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    tooltip.dismiss();
-                }
-            }, 5000);
+            new Handler(Looper.getMainLooper()).postDelayed(tooltip::dismiss, 5000);
         }
 
         // Configurar el adaptador para la vista ListView
@@ -137,7 +142,7 @@ public class BudgetTabFragment extends Fragment {
         budget_button.setOnClickListener(v -> {
             budget_button.setVisibility(View.GONE);
             budgetEditText.setVisibility(View.GONE);
-            budgetDisplay.setText(budgetEditText.getText().toString() + "€");
+            budgetDisplay.setText(getString(R.string.budget_text, budgetEditText.getText().toString()));
             budgetDisplay.setVisibility(View.VISIBLE);
             expenseAmountEditText.setVisibility(View.VISIBLE);
             expenseConceptEditText.setVisibility(View.VISIBLE);
@@ -154,6 +159,7 @@ public class BudgetTabFragment extends Fragment {
     private void setBudget() {
 
         String budgetText = budgetEditText.getText().toString();
+        assert getArguments() != null;
         String tripId = getArguments().getString("tripId");
 
         if (!budgetText.isEmpty()) {
@@ -161,7 +167,7 @@ public class BudgetTabFragment extends Fragment {
             updateBudgetDisplay();
 
             // Guardar el valor del presupuesto en un archivo de texto
-            File directory = new File(getActivity().getFilesDir(), "Presupuesto");
+            File directory = new File(requireActivity().getFilesDir(), "Presupuesto");
             if (!directory.exists()) {
                 directory.mkdir();
             }
@@ -181,7 +187,7 @@ public class BudgetTabFragment extends Fragment {
     private void updateBudgetDisplay() {
         // Gastos totales
         double totalExpenses = 0.0;
-        budgetDisplay.setText(String.format("%.2f", budget - totalExpenses));
+        budgetDisplay.setText(String.format(Locale.US, "%.2f", budget - totalExpenses));
     }
 
     private void addExpense() {
@@ -211,8 +217,9 @@ public class BudgetTabFragment extends Fragment {
             // Guardar la lista de gastos en un archivo de texto
             saveExpenseList(amountText,conceptText);
             // Guardar el nuevo valor del presupuesto en el archivo de texto "budget.txt"
+            assert getArguments() != null;
             String tripId = getArguments().getString("tripId");
-            File directory = new File(getActivity().getFilesDir(), "Presupuesto");
+            File directory = new File(requireActivity().getFilesDir(), "Presupuesto");
             File tripDirectory = new File(directory, tripId);
             File file = new File(tripDirectory, "budget.txt");
             try (FileOutputStream outputStream = new FileOutputStream(file)) {
@@ -225,8 +232,9 @@ public class BudgetTabFragment extends Fragment {
 
     private void saveExpenseList(String amountText, String conceptText){
 
+        assert getArguments() != null;
         String tripId = getArguments().getString("tripId");
-        File directory = new File(getActivity().getFilesDir(), "Presupuesto");
+        File directory = new File(requireActivity().getFilesDir(), "Presupuesto");
         if (!directory.exists()) {
             directory.mkdir();
         }
@@ -254,7 +262,7 @@ public class BudgetTabFragment extends Fragment {
         @NotNull
         @Override
         public String toString() {
-            return concept + ": " + String.format("%.2f", amount);
+            return concept + ": " + String.format(Locale.US, "%.2f", amount);
         }
     }
 

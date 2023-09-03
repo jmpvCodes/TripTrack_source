@@ -1,15 +1,17 @@
 package com.example.triptrack;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Plans {
-    private String tripId;
-    private long date;
-    private String time;
-    private String location;
-    private int priority;
-    private String description;
+    private final String tripId;
+    private final long date;
+    private final String time;
+    private final String location;
+    private final int priority;
+    private final String description;
 
     public Plans(String tripId, long date, String time, String location, int priority, String description) {
         this.tripId = tripId;
@@ -44,6 +46,7 @@ public class Plans {
         return description;
     }
 
+    @NotNull
     @Override
     public String toString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");

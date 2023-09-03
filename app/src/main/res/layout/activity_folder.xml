@@ -33,11 +33,12 @@
 
 			<!-- Title -->
 			<TextView
+
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:id="@+id/textView"
+					android:id="@+id/titleFolder"
 					android:gravity="left"
-					android:text="CARRETE DE VIAJE"
+					android:text=""
 					android:textSize="16sp"
 					android:textColor="@color/colorPrimary"
 					android:textStyle="bold"
@@ -55,18 +56,14 @@
 
 		</androidx.appcompat.widget.Toolbar>
 
-		<com.google.android.material.tabs.TabLayout
-				android:id="@+id/tab_layout"
+		<GridView
+				android:id="@+id/gridView"
+				android:layout_margin="20dp"
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				app:tabSelectedTextColor="@color/colorPrimary"
-				app:tabTextColor="@color/colorPrimary"
-		/>
-
-		<androidx.viewpager.widget.ViewPager
-				android:id="@+id/view_pager"
-				android:layout_width="match_parent"
-				android:layout_height="523dp" />
+				android:layout_height="530dp"
+				android:columnWidth="100dp"
+				android:horizontalSpacing="10dp"
+				android:verticalSpacing="10dp" />
 
 		<!-- Bottom Navigation Bar -->
 		<com.google.android.material.bottomnavigation.BottomNavigationView
@@ -79,4 +76,5 @@
 
 	</LinearLayout>
 
-	</androidx.drawerlayout.widget.DrawerLayout>
+
+</androidx.drawerlayout.widget.DrawerLayout>

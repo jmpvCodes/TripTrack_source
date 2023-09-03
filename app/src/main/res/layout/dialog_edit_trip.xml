@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:layout_width="match_parent"
+			  android:layout_height="wrap_content"
+			  android:orientation="vertical"
+			  android:padding="16dp">
+
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+		<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Destino:"
+				android:textSize="18sp" />
+
+		<EditText
+				android:id="@+id/destination_edit_text"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+	</LinearLayout>
+
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+		<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Fecha de ida:"
+				android:textSize="18sp" />
+
+		<EditText
+				android:id="@+id/departure_date_edit_text"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+	</LinearLayout>
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+		<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Fecha de vuelta:"
+				android:textSize="18sp" />
+
+		<EditText
+				android:id="@+id/return_date_edit_text"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+	</LinearLayout>
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+		<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Número de personas:"
+				android:textSize="18sp" />
+
+		<EditText
+				android:id="@+id/people_count_edit_text"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+	</LinearLayout>
+	<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal">
+
+		<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Precio:"
+				android:textSize="18sp" />
+
+		<EditText
+				android:id="@+id/price_edit_text"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+	</LinearLayout>
+
+</LinearLayout>
+

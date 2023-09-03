@@ -1,23 +1,17 @@
 package com.example.triptrack;
 
-import android.graphics.Color;
-import android.os.Handler;
-import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.View;
-import android.widget.*;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.ImageButton;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.tabs.TabLayout;
-import com.tooltip.Tooltip;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.Objects;
 
 public class ExpenseCalculationActivity extends AppCompatActivity {
 
@@ -28,7 +22,7 @@ public class ExpenseCalculationActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> onBackPressed());
@@ -63,7 +57,7 @@ public class ExpenseCalculationActivity extends AppCompatActivity {
                 return 2;
             }
 
-            @Nullable
+            @NotNull
             @Override
             public CharSequence getPageTitle(int position) {
                 if (position == 0) {

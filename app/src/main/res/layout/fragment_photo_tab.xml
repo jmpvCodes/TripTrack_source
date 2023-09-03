@@ -3,48 +3,59 @@
 			 xmlns:tools="http://schemas.android.com/tools"
 			 android:layout_width="match_parent"
 			 android:layout_height="match_parent"
+			 xmlns:app="http://schemas.android.com/apk/res-auto"
 			 tools:context=".PhotoTabFragment">
-
-	<!-- TODO: Update blank fragment layout -->
 
 	<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:orientation="vertical">
 
-	<LinearLayout
-			android:id="@+id/linearLayout"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:gravity="center_vertical">
-
-		<ImageButton
-				android:layout_width="50dp"
-				android:layout_height="50dp"
-				android:layout_margin="10dp"
-				android:src="@drawable/import_photo_button"
-				android:scaleType="fitStart"
-				android:backgroundTint="@color/white">
-		</ImageButton>
+		<com.airbnb.lottie.LottieAnimationView
+				android:id="@+id/lottieAnimationView"
+				android:layout_width="250dp"
+				android:layout_height="250dp"
+				android:layout_marginTop="50dp"
+				android:layout_gravity="center_horizontal"
+				app:lottie_rawRes="@raw/import_photo" />
 
 		<TextView
+				android:id="@+id/messageTextView"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal|center_vertical"
+				android:layout_marginLeft="75dp"
+				android:layout_marginRight="75dp"
+				android:text="¡Aún no tienes ni fotos ni videos!"
+				/>
+		<TextView
+				android:id="@+id/messageTextView2"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal|center_vertical"
+				android:layout_marginLeft="90dp"
+				android:layout_marginRight="90dp"
+				android:layout_marginTop="20dp"
+				android:text="¡Comienza desde hoy a inmortalizar los momentos de tu viaje!"
+		/>
+
+		<GridView
+				android:id="@+id/gridview"
 				android:gravity="center"
-				android:text="IMPORTAR FOTOS/VIDEOS">
-		</TextView>
+				android:layout_marginTop="25dp"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:numColumns="auto_fit"/>
+
+		<Button
+				android:id="@+id/createFolderButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal"
+				android:layout_marginTop="25dp"
+				android:layout_marginBottom="25dp"
+				android:text="Importar más momentos" />
 
 	</LinearLayout>
-
-	<GridView
-			android:id="@+id/gridview"
-			android:gravity="center"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:numColumns="auto_fit"/>
-
-	</LinearLayout>
-
 
 </FrameLayout>

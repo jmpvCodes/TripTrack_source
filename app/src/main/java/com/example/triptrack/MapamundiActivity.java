@@ -1,6 +1,12 @@
 package com.example.triptrack;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.Address;
+import android.location.Geocoder;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageButton;
 import androidx.annotation.NonNull;
@@ -14,7 +20,10 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MapamundiActivity extends AppCompatActivity {
 
@@ -25,6 +34,7 @@ public class MapamundiActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mapamundi);
+        Configuration.getInstance().getOsmdroidTileCache().delete();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -34,32 +44,35 @@ public class MapamundiActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> onBackPressed());
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(
-                new BottomNavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        // Obtener el ID del item seleccionado
-                        int itemId = item.getItemId();
+        bottomNavigationView.setOnItemSelectedListener(
+                (BottomNavigationView.OnNavigationItemSelectedListener) item -> {
+                    // Obtener el ID del item seleccionado
+                    int itemId = item.getItemId();
 
-                        // Realizar acciones basadas en el item seleccionado
-                        switch (itemId) {
-                            case R.id.bottom_nav_my_trips:
-                                // Acción para la pestaña "Inicio"
-                                // Ejemplo: iniciar la actividad correspondiente
-                                Intent homeIntent = new Intent(MapamundiActivity.this, MainActivity.class);
-                                startActivity(homeIntent);
-                                return true;
-                            case R.id.bottom_nav_settings:
-                                // Acción para la pestaña "Perfil"
-                                // Ejemplo: iniciar la actividad correspondiente
-                                Intent profileIntent = new Intent(MapamundiActivity.this, ConfigurationActivity.class);
-                                startActivity(profileIntent);
-                                return true;
-                        }
-
-                        return false;
+                    // Realizar acciones basadas en el item seleccionado
+                    if (itemId == R.id.nav_my_trips) {
+                        // Acción para la pestaña "Buscar"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent mainIntent = new Intent(this, MainActivity.class);
+                        startActivity(mainIntent);
+                        return true;
+                    } else if (itemId == R.id.bottom_nav_world) {
+                        // Acción para la pestaña "Buscar"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent searchIntent = new Intent(this, MapamundiActivity.class);
+                        startActivity(searchIntent);
+                        return true;
+                    } else if (itemId == R.id.bottom_nav_settings) {
+                        // Acción para la pestaña "Perfil"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent profileIntent = new Intent(this, ConfigurationActivity.class);
+                        startActivity(profileIntent);
+                        return true;
                     }
+
+                    return false;
                 });
+
 
         // Configuración del proveedor de mapas de osmdroid
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
@@ -77,19 +90,44 @@ public class MapamundiActivity extends AppCompatActivity {
         // Inicializar la lista de marcadores
         markers = new ArrayList<>();
 
-        // Agregar marcadores de ejemplo
-        addMarker(new GeoPoint(40.7128, -74.0060), "Nueva York");
-        addMarker(new GeoPoint(51.5074, -0.1278), "Londres");
-        addMarker(new GeoPoint(-33.8688, 151.2093), "Sídney");
+        IntentFilter filter = new IntentFilter("com.example.triptrack.DESTINATION_DATA");
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                // Recuperar el valor del destino del intent
+                String destination = intent.getStringExtra("destination");
 
-        // Mostrar los marcadores en el mapa
-        showMarkers();
+                if (destination != null) {
+                    Geocoder geocoder = new Geocoder(context);
+                    List<Address> addresses = null;
+                    try {
+                        addresses = geocoder.getFromLocationName(destination, 1);
+                        Log.d("MapamundiActivity", "Destination: " + destination);
+                        Log.d("MapamundiActivity", "Addresses: " + addresses);
+
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if (addresses.size() > 0) {
+                        Address address = addresses.get(0);
+                        GeoPoint geoPoint = new GeoPoint(address.getLatitude(), address.getLongitude());
+                        addMarker(geoPoint, destination);
+                        showMarkers();
+
+
+                }
+                }            }
+        };
+        registerReceiver(receiver, filter);
+
     }
 
     // Método para agregar un marcador a la lista
     private void addMarker(GeoPoint position, String title) {
         OverlayItem marker = new OverlayItem(title, null, position);
         markers.add(marker);
+        Log.d("MapamundiActivity", "Marker added: " + title + ", position: " + position);
+
     }
 
     // Método para mostrar los marcadores en el mapa

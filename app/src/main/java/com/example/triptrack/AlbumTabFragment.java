@@ -1,21 +1,22 @@
 package com.example.triptrack;
 
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,9 +32,6 @@ public class AlbumTabFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public AlbumTabFragment() {
         // Required empty public constructor
@@ -60,10 +58,7 @@ public class AlbumTabFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        // TODO: Rename and change types of parameters
     }
 
     @Override
@@ -77,18 +72,35 @@ public class AlbumTabFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        LottieAnimationView lottieAnimationView1 = view.findViewById(R.id.lottieAnimationView);
+        TextView messageTextView = view.findViewById(R.id.messageTextView);
+
         // Obtener la lista de carpetas en la carpeta tripId
-        String tripId = getActivity().getIntent().getStringExtra("tripId");
-        File directory = new File(getActivity().getFilesDir(), "Galería/" + tripId);
-        File[] folders = directory.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.isDirectory();
-            }
-        });
+        String tripId = requireActivity().getIntent().getStringExtra("tripId");
+        File directory = new File(requireActivity().getFilesDir(), "Galería/" + tripId);
+        File[] files = directory.listFiles();
+        File[] folders;
+
+        if (directory.isDirectory()) {
+            folders = directory.listFiles(File::isDirectory);
+        } else {
+            folders = null;
+        }
+
         List<String> folderNames = new ArrayList<>();
-        for (File folder : folders) {
-            folderNames.add(folder.getName());
+        if (folders != null && folders.length > 0) {
+            for (File folder : folders) {
+                folderNames.add(folder.getName());
+            }
+
+            lottieAnimationView1.setVisibility(View.GONE);
+            messageTextView.setVisibility(View.GONE);
+
+        } else {
+            lottieAnimationView1.setVisibility(View.VISIBLE);
+            lottieAnimationView1.setRepeatCount(LottieDrawable.INFINITE);
+            lottieAnimationView1.playAnimation();
+            messageTextView.setVisibility(View.VISIBLE);
         }
 
         // Mostrar la lista de carpetas en un ListView
@@ -96,58 +108,152 @@ public class AlbumTabFragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, folderNames);
         listView.setAdapter(adapter);
 
+        listView.setOnItemLongClickListener((parent, view12, position, id) -> {
+            // Crear el menú contextual
+            PopupMenu popupMenu = new PopupMenu(getContext(), view12);
+            Menu menu = popupMenu.getMenu();
+            menu.add("Borrar");
+            menu.add("Renombrar");
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if (item.getTitle().equals("Borrar")) {
+                    String folderName = folderNames.get(position);
+                    new AlertDialog.Builder(requireContext())
+                            .setTitle("Eliminar carpeta")
+                            .setMessage("¿Estás seguro de que deseas eliminar esta carpeta?")
+                            .setPositiveButton("Sí", (dialog, which) -> {
+                                // Eliminar la carpeta del almacenamiento interno de la aplicación
+                                File folder = new File(directory, folderName);
+                                deleteRecursive(folder);
 
-        // Reproducir la animación de Lottie
-        LottieAnimationView lottieAnimationView = view.findViewById(R.id.lottieAnimationView);
-        lottieAnimationView.setRepeatCount(LottieDrawable.INFINITE);
-        lottieAnimationView.playAnimation();
+                                // Actualizar la lista de carpetas en el ListView
+                                folderNames.remove(folderName);
+                                adapter.notifyDataSetChanged();
+
+                                // Forzar la actualización de la vista
+                                if (folderNames.isEmpty()) {
+                                    lottieAnimationView1.setVisibility(View.VISIBLE);
+                                    lottieAnimationView1.setRepeatCount(LottieDrawable.INFINITE);
+                                    lottieAnimationView1.playAnimation();
+                                    messageTextView.setVisibility(View.VISIBLE);
+                                } else {
+                                    lottieAnimationView1.setVisibility(View.GONE);
+                                    messageTextView.setVisibility(View.GONE);
+                                }
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
 
 
-        // Mostrar un menú contextual cuando se hace clic en el botón "Crear nueva carpeta"
-        Button createFolderButton = view.findViewById(R.id.createFolderButton);
-        createFolderButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("Crear nueva carpeta");
 
-                // Configurar el campo de entrada de texto para el nombre de la carpeta
-                final EditText input = new EditText(getActivity());
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                builder.setView(input);
+                }
 
-                // Configurar los botones "Aceptar" y "Cancelar"
-                builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Acciones a realizar cuando se hace clic en "Aceptar"
-                        String folderName = input.getText().toString();
-                        String tripId = getActivity().getIntent().getStringExtra("tripId");
+                if (item.getTitle().equals("Renombrar")) {
+                    String folderName = folderNames.get(position);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                    builder.setTitle("Renombrar carpeta");
 
-                        // Crear una nueva carpeta
-                        File directory = new File(getActivity().getFilesDir(), "Galería/" + tripId + "/" + folderName);
-                        if (!directory.exists()) {
-                            directory.mkdirs();
+                    // Configurar el campo de texto de entrada
+                    final EditText input = new EditText(requireContext());
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    input.setText(folderName);
+                    builder.setView(input);
+
+                    // Configurar los botones
+                    builder.setPositiveButton("Aceptar", (dialog, which) -> {
+                        String newFolderName = input.getText().toString();
+
+                        // Renombrar la carpeta en el almacenamiento interno de la aplicación
+                        File oldFolder = new File(directory, folderName);
+                        File newFolder = new File(directory, newFolderName);
+                        boolean success = oldFolder.renameTo(newFolder);
+
+                        if (success) {
+                            // Actualizar la lista de carpetas en el ListView
+                            folderNames.set(position, newFolderName);
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            Toast.makeText(requireContext(), "Error al renombrar la carpeta", Toast.LENGTH_SHORT).show();
                         }
+                    });
+                    builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.cancel());
 
-                        // Ocultar la animación de Lottie y el texto
-                        LottieAnimationView lottieAnimationView = view.findViewById(R.id.lottieAnimationView);
-                        lottieAnimationView.setVisibility(View.GONE);
-                        TextView messageTextView = view.findViewById(R.id.messageTextView);
-                        messageTextView.setVisibility(View.GONE);
-                    }
-                });
+                    builder.show();
+                }
 
-                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
+                return true;
 
-                builder.show();
-            }
+            });
+            popupMenu.show();
+            return true;
         });
+
+        listView.setOnItemClickListener((parent, view1, position, id) -> {
+                // Obtener el nombre de la carpeta seleccionada
+                String folderName = (String) parent.getItemAtPosition(position);
+
+                Intent intent = new Intent(getActivity(), FolderActivity.class);
+                intent.putExtra("tripId", tripId);
+                intent.putExtra("folderName", folderName);
+                startActivity(intent);
+
+            });
+
+            // Mostrar un menú contextual cuando se hace clic en el botón "Crear nueva carpeta"
+            Button createFolderButton = view.findViewById(R.id.createFolderButton);
+        createFolderButton.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+            builder.setTitle("Crear nueva carpeta");
+
+            // Configurar el campo de entrada de texto para el nombre de la carpeta
+            final EditText input = new EditText(getActivity());
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
+
+            // Configurar los botones "Aceptar" y "Cancelar"
+            builder.setPositiveButton("Aceptar", (dialog, which) -> {
+                // Acciones a realizar cuando se hace clic en "Aceptar"
+                String folderName = input.getText().toString();
+
+                // Crear una nueva carpeta
+                File directory1 = new File(getActivity().getFilesDir(), "Galería/" + tripId + "/" + folderName);
+                if (!directory1.exists()) {
+                    directory1.mkdirs();
+                }
+
+                // Actualizar la lista de carpetas
+                folderNames.add(folderName);
+                adapter.notifyDataSetChanged();
+
+                // Ocultar la animación de Lottie y el texto si existen carpetas
+                if (!folderNames.isEmpty()) {
+                    lottieAnimationView1.setVisibility(View.GONE);
+                    messageTextView.setVisibility(View.GONE);
+                }
+            });
+            builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.cancel());
+
+            builder.show();
+        });
+
+    }
+
+    // Método auxiliar para eliminar una carpeta y su contenido de forma recursiva
+    private void deleteRecursive(File fileOrDirectory) {
+        Log.d("deleteRecursive", "Deleting: " + fileOrDirectory.getAbsolutePath());
+        if (fileOrDirectory.isDirectory()) {
+            File[] files = fileOrDirectory.listFiles();
+            if (files != null) {
+                for (File child : files) {
+                    deleteRecursive(child);
+                }
+            } else {
+                Log.e("deleteRecursive", "Failed to list files in directory: " + fileOrDirectory.getAbsolutePath());
+            }
+        }
+        boolean deleted = fileOrDirectory.delete();
+        if (!deleted) {
+            Log.e("deleteRecursive", "Failed to delete: " + fileOrDirectory.getAbsolutePath());
+        }
     }
 
 }
