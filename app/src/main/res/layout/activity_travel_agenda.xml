@@ -76,21 +76,29 @@
 					android:layout_width="wrap_content"
 					android:layout_gravity="left|center"
 					android:layout_marginLeft="30dp"
-					android:textSize="17dp"
+					android:textSize="16dp"
 					style="?android:listSeparatorTextViewStyle"
 					android:text="PLANES PROGRAMADOS" />
 
 			<com.google.android.material.floatingactionbutton.FloatingActionButton
 					android:id="@+id/add_trip_button"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
+					android:layout_width="53dp"
+					android:layout_height="53dp"
 					android:src="@drawable/ic_add"
 					android:layout_gravity="right|center_horizontal"
-					android:layout_marginLeft="80dp"
+					android:scaleType="center"
+					android:layout_marginLeft="50dp"
 					app:backgroundTint="@color/colorAccent" />
 
-
-
+			<com.google.android.material.floatingactionbutton.FloatingActionButton
+					android:id="@+id/clean_trip_button"
+					android:layout_width="53dp"
+					android:layout_height="53dp"
+					android:layout_gravity="right|center_horizontal"
+					android:scaleType="center"
+					android:layout_marginLeft="10dp"
+					app:backgroundTint="@color/verde_claro"
+					app:srcCompat="@drawable/clean" />
 
 		</LinearLayout>
 

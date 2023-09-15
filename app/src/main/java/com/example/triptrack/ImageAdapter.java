@@ -15,18 +15,24 @@ import android.widget.ImageView;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class ImageAdapter extends BaseAdapter {
     private Context context;
     private File[] files;
     private Set<Integer> selectedPositions = new HashSet<>();
     private boolean selectionMode = false;
+    private List<Bitmap> imageList;
+
+    private List<String> fileNames;
 
     public ImageAdapter(Context context) {
         this.context = context;
+        this.imageList = new ArrayList<>();
+        this.fileNames = new ArrayList<>();
+        this.files = new File[0]; // Inicializar files como una matriz vacía
     }
+
 
     public void setFiles(File[] files) {
         this.files = files;
@@ -47,7 +53,7 @@ public class ImageAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return files != null ? files.length : 0;
+        return files != null ? files.length : 0; // Aquí debes devolver la longitud de 'files', no de 'imageList'
     }
 
     @Override
@@ -65,11 +71,16 @@ public class ImageAdapter extends BaseAdapter {
         ImageView imageView;
         if (convertView == null) {
             imageView = new ImageView(context);
-            imageView.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, 200));
+            imageView.setLayoutParams(new GridView.LayoutParams(250, 250)); // Aumentar el ancho y el alto para hacer que las imágenes se vean más grandes
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(8, 8, 8, 8);
         } else {
             imageView = (ImageView) convertView;
+        }
+
+        // Verificar si imageList tiene un elemento en la posición dada antes de intentar acceder a él
+        if (position < imageList.size()) {
+            imageView.setImageBitmap(imageList.get(position));
         }
 
         // Cambiar el fondo de las vistas de las fotos seleccionadas
@@ -101,4 +112,15 @@ public class ImageAdapter extends BaseAdapter {
 
         return imageView;
     }
+
+    public void add(Bitmap image, String fileName) {
+        imageList.add(image);
+        fileNames.add(fileName);
+
+        // Agregar el archivo a files
+        File file = new File(fileName);
+        files = Arrays.copyOf(files, files.length + 1);
+        files[files.length - 1] = file;
+    }
+
 }

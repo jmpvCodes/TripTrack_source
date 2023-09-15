@@ -56,14 +56,56 @@
 
 		</androidx.appcompat.widget.Toolbar>
 
+		<com.airbnb.lottie.LottieAnimationView
+				android:id="@+id/lottieAnimationView"
+				android:layout_width="250dp"
+				android:layout_height="250dp"
+				android:layout_marginTop="50dp"
+				android:layout_gravity="center_horizontal"
+				app:lottie_rawRes="@raw/import_photo" />
+
+		<TextView
+				android:id="@+id/messageTextView"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal|center_vertical"
+				android:layout_marginLeft="75dp"
+				android:layout_marginRight="75dp"
+				android:text="¡Aún no tienes ni fotos ni videos!"
+		/>
+		<TextView
+				android:id="@+id/messageTextView2"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal|center_vertical"
+				android:layout_marginLeft="90dp"
+				android:layout_marginRight="90dp"
+				android:layout_marginTop="20dp"
+				android:text="¡Comienza desde hoy a inmortalizar los momentos de tu viaje!"
+		/>
+
 		<GridView
 				android:id="@+id/gridView"
-				android:layout_margin="20dp"
+				android:numColumns="auto_fit"
+				android:gravity="center"
+				android:layout_marginTop="25dp"
 				android:layout_width="match_parent"
-				android:layout_height="530dp"
+				android:layout_height="450dp"
 				android:columnWidth="100dp"
 				android:horizontalSpacing="10dp"
 				android:verticalSpacing="10dp" />
+
+		<com.google.android.material.floatingactionbutton.FloatingActionButton
+				android:id="@+id/createFolderButton"
+				android:layout_width="55dp"
+				android:layout_marginTop="20dp"
+				android:layout_marginBottom="20dp"
+				android:layout_marginRight="40dp"
+				android:layout_height="55dp"
+				android:src="@drawable/ic_add"
+				android:layout_gravity="right"
+				android:scaleType="center"
+				app:backgroundTint="@color/colorAccent" />
 
 		<!-- Bottom Navigation Bar -->
 		<com.google.android.material.bottomnavigation.BottomNavigationView

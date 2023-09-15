@@ -6,12 +6,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Plans {
-    private final String tripId;
-    private final long date;
-    private final String time;
-    private final String location;
-    private final int priority;
-    private final String description;
+    private String tripId;
+    private long date;
+    private String time;
+    private String location;
+    private int priority;
+    private String description;
 
     public Plans(String tripId, long date, String time, String location, int priority, String description) {
         this.tripId = tripId;
@@ -44,6 +44,26 @@ public class Plans {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setTripId(String tripId) {
+        this.tripId = tripId;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @NotNull

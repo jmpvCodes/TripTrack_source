@@ -10,7 +10,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.*;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.PopupMenu;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -18,7 +21,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
-import org.w3c.dom.Text;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -37,8 +40,6 @@ public class PhotoTabFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
     private String mParam2;
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -51,7 +52,7 @@ public class PhotoTabFragment extends Fragment {
 
     private View rootView;
 
-    private Button createFolderButton;
+    private FloatingActionButton createFolderButton;
 
     private GridView gridView;
 
@@ -84,7 +85,8 @@ public class PhotoTabFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            // TODO: Rename and change types of parameters
+            String mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
@@ -138,12 +140,13 @@ public class PhotoTabFragment extends Fragment {
                 // Obtener la extensión del archivo
                 String extension = file.getName().substring(file.getName().lastIndexOf(".") + 1);
                 // Verificar si la extensión del archivo es una de las extensiones permitidas
-                return extension.equals("jpg") || extension.equals("png") || extension.equals("mp4");
+                return extension.equals("jpg") || extension.equals("png") || extension.equals("mp4") || extension.equals("jpeg") ;
             }
         };
 
 // Obtener la lista de archivos que cumplen con el filtro
         File[] files = directory.listFiles(filter);
+
 
 // Verificar si hay archivos en la lista
         if (files != null && files.length > 0) {

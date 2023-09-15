@@ -10,22 +10,22 @@ import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class TravelAgendaActivity extends AppCompatActivity {
 
     private String tripId;
     private MaterialCalendarView calendarView;
     private ListView scheduledTripsList;
+
+    private final List<DayViewDecorator> decorators = new ArrayList<>();
     final ArrayList<Plans> scheduledPlans = new ArrayList<>();
 
     @Override
@@ -35,12 +35,13 @@ public class TravelAgendaActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> onBackPressed());
 
         tripId = getIntent().getStringExtra("tripId");
+
         loadPlans(tripId);
 
         calendarView = findViewById(R.id.calendarView);
@@ -51,8 +52,15 @@ public class TravelAgendaActivity extends AppCompatActivity {
         // Agregar el decorador al MaterialCalendarView
         calendarView.addDecorator(decorator);
 
-        FloatingActionButton addTripButton = findViewById(R.id.add_trip_button);
+        // Actualizar la vista del calendario para mostrar los círculos en cada día
+        updateCalendarView(scheduledPlans, calendarView);
+
         scheduledTripsList = findViewById(R.id.scheduled_trips_list);
+
+        FloatingActionButton addTripButton = findViewById(R.id.add_trip_button);
+
+        FloatingActionButton cleanTripButton = findViewById(R.id.clean_trip_button);
+
 
         calendarView.setOnDateChangedListener((widget, date, selected) -> {
             Calendar calendar = Calendar.getInstance();
@@ -73,6 +81,21 @@ public class TravelAgendaActivity extends AppCompatActivity {
         });
 
         addTripButton.setOnClickListener(v -> showAddPlanDialog());
+        cleanTripButton.setOnClickListener(v -> {
+            // Crear un AlertDialog para preguntar al usuario si está seguro de borrar todos los planes
+            new AlertDialog.Builder(this)
+                    .setTitle("Borrar todos los planes")
+                    .setMessage("¿Estás seguro de que quieres borrar todos los planes del día seleccionado?")
+                    .setPositiveButton("Sí", (dialog, which) -> {
+                        // Borrar todos los planes
+                        cleanAllPlans();
+
+                        // Mostrar un Toast para informar al usuario de que se completó el borrado
+                        Toast.makeText(this, "Se eliminaron todos los planes correctamente", Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        });
 
         updateScheduledPlansList();
     }
@@ -135,16 +158,12 @@ public class TravelAgendaActivity extends AppCompatActivity {
 
             String description = descriptionEditText.getText().toString();
 
-// Obtener la fecha seleccionada usando el método getSelectedDate()
+            // Obtener la fecha seleccionada usando el método getSelectedDate()
             CalendarDay selectedDate = calendarView.getSelectedDate();
-// Crear un objeto Calendar a partir de la fecha seleccionada
+            // Crear un objeto Calendar a partir de la fecha seleccionada
             Calendar calendar = selectedDate.getCalendar();
-// Obtener el tiempo en milisegundos de la fecha seleccionada
+            // Obtener el tiempo en milisegundos de la fecha seleccionada
             long dateInMillis = calendar.getTimeInMillis();
-// Formatear la fecha en el formato deseado
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            String date = dateFormat.format(new Date(dateInMillis));
-            Log.d("TravelAgendaActivity", "Date: " + date);
 
             Plans trip = new Plans(tripId, dateInMillis, time, location, priority, description);
             scheduledPlans.add(trip);
@@ -158,7 +177,6 @@ public class TravelAgendaActivity extends AppCompatActivity {
 
         builder.show();
     }
-
     public void updateScheduledPlansList() {
 
         // Obtener la fecha seleccionada usando el método getSelectedDate()
@@ -178,16 +196,19 @@ public class TravelAgendaActivity extends AppCompatActivity {
 
             ArrayList<Plans> filteredTrips = new ArrayList<>();
             for (Plans plan : scheduledPlans) {
-                calendar.setTimeInMillis(plan.getDate());
-                calendar.set(Calendar.HOUR_OF_DAY, 0);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
-                calendar.set(Calendar.MILLISECOND, 0);
-                long planDate = calendar.getTimeInMillis();
-                if (planDate == selectedDateInMillis) {
+                if (plan.getDate() == selectedDateInMillis) {
                     filteredTrips.add(plan);
                 }
             }
+
+            // Ordenar los planes por prioridad y hora
+            filteredTrips.sort((o1, o2) -> {
+                if (o1.getPriority() == o2.getPriority()) {
+                    return o1.getTime().compareTo(o2.getTime());
+                } else {
+                    return o1.getPriority() - o2.getPriority();
+                }
+            });
 
             Log.d("TravelAgendaActivity", "Filtered plans: " + filteredTrips);
 
@@ -198,8 +219,13 @@ public class TravelAgendaActivity extends AppCompatActivity {
             updateCalendarView(scheduledPlans, calendarView);
         }
     }
-
     private void updateCalendarView(@NotNull List<Plans> scheduledPlans, MaterialCalendarView calendarView) {
+        // Eliminar solo los decoradores de PlanDayDecorator
+        for (DayViewDecorator decorator : decorators) {
+            if (decorator instanceof PlanDayDecorator) {
+                calendarView.removeDecorator(decorator);
+            }
+        }
 
         // Crear un decorador personalizado para cada plan
         for (Plans plan : scheduledPlans) {
@@ -223,12 +249,54 @@ public class TravelAgendaActivity extends AppCompatActivity {
 
             // Crear un decorador personalizado para el plan
             PlanDayDecorator decorator = new PlanDayDecorator(day, spans);
+            decorators.add(decorator);
 
             // Agregar el decorador al MaterialCalendarView
             calendarView.addDecorator(decorator);
         }
     }
+    private void loadPlans(String tripId) {
+        Log.d("TravelAgendaActivity", "Loading plans for tripId: " + tripId);
+        try {
+            File plansDir = new File(getFilesDir(), "Planes");
+            File tripDir = new File(plansDir, tripId);
+            File plansFile = new File(tripDir, "plans.txt");
 
+            if (plansFile.exists()) {
+                FileInputStream inputStream = new FileInputStream(plansFile);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Log.d("TravelAgendaActivity", "Read plan from file: " + line);
+                    String[] parts = line.split(";");
+                    if (parts.length >= 5 && parts.length <= 6) {
+                        tripId = parts[0];
+                        Date date = dateFormat.parse(parts[1]);
+                        String time = parts[2];
+                        String location = parts[3];
+                        int priority = Integer.parseInt(parts[4]);
+                        String description = parts.length == 6 ? parts[5] : "";
+
+                        assert date != null;
+                        Plans plan = new Plans(tripId, date.getTime(), time, location, priority, description);
+                        scheduledPlans.add(plan);
+                    } else {
+                        Log.w("TravelAgendaActivity", "Invalid plan line: " + line);
+                    }
+                }
+
+                reader.close();
+                inputStream.close();
+            } else {
+                Log.w("TravelAgendaActivity", "Plans file not found");
+            }
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
     public void savePlans() {
         try {
             File plansDir = new File(getFilesDir(), "Planes");
@@ -257,7 +325,6 @@ public class TravelAgendaActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
     public void deletePlan(Plans plan) {
         // Eliminar el plan de la lista de planes programados
         scheduledPlans.remove(plan);
@@ -266,47 +333,17 @@ public class TravelAgendaActivity extends AppCompatActivity {
         savePlans();
         updateScheduledPlansList();
     }
+    private void cleanAllPlans() {
+        // Borrar todos los planes de la lista scheduledPlans
+        scheduledPlans.clear();
 
+        // Guardar los cambios en el archivo plans.txt
+        savePlans();
 
-    private void loadPlans(String tripId) {
-        try {
-            File plansDir = new File(getFilesDir(), "Planes");
-            File tripDir = new File(plansDir, tripId);
-            File plansFile = new File(tripDir, "plans.txt");
-
-
-            if (plansFile.exists()) {
-                FileInputStream inputStream = new FileInputStream(plansFile);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    Log.d("TravelAgendaActivity", "Read plan from file: " + line);
-                    String[] parts = line.split(";");
-                    if (parts.length == 6) {
-                        tripId = parts[0];
-                        Date date = dateFormat.parse(parts[1]);
-                        String time = parts[2];
-                        String location = parts[3];
-                        int priority = Integer.parseInt(parts[4]);
-                        String description = parts[5];
-
-                        Plans plan = new Plans(tripId, date.getTime(), time, location, priority, description);
-                        scheduledPlans.add(plan);
-                    } else {
-                        Log.w("TravelAgendaActivity", "Invalid plan line: " + line);
-                    }
-                }
-
-                reader.close();
-                inputStream.close();
-            }
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
+        // Actualizar la vista
+        updateScheduledPlansList();
     }
+
 
 
 }

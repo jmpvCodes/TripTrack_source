@@ -75,5 +75,6 @@ public class MyGridViewAdapter extends BaseAdapter {
         imageList.clear();
         notifyDataSetChanged();
     }
+
 }
 

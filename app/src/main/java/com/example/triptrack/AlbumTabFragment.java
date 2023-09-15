@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -199,7 +200,7 @@ public class AlbumTabFragment extends Fragment {
             });
 
             // Mostrar un menú contextual cuando se hace clic en el botón "Crear nueva carpeta"
-            Button createFolderButton = view.findViewById(R.id.createFolderButton);
+            FloatingActionButton createFolderButton = view.findViewById(R.id.createFolderButton);
         createFolderButton.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
             builder.setTitle("Crear nueva carpeta");
