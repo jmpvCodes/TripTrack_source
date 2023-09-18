@@ -1,2 +1,2 @@
 # TripTrack
-Aplicación orientada para viajeros en la cual se incluyen potentes funcionalidades.
+Aplicación orientada para viajeros en la cual se incluyen multitud funcionalidades.
