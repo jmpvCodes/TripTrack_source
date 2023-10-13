@@ -4,11 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.widget.*;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -22,6 +21,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -57,32 +58,34 @@ public class MainActivity extends AppCompatActivity {
         list_trips_text = findViewById(R.id.list_trips_text);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("viajes")
-                .whereNotEqualTo("status", "finalizado")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<DocumentSnapshot> documents = task.getResult().getDocuments();
-                        if (documents.size() > 0) {
-                            // Hay viajes en la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
-                            warningCard.setVisibility(View.GONE);
-                            list_trips_text.setVisibility(View.VISIBLE);
-                            loadTrips();
-                        } else {
-                            // No hay viajes en la colección "viajes" que no tengan el atributo "status" con valor "finalizado"
-                            warningCard.setVisibility(View.VISIBLE);
-                            LottieAnimationView animationView = findViewById(R.id.animation_view);
-                            animationView.cancelAnimation();
-                            animationView.setVisibility(View.GONE);
-                        }
-                    }  // Error al obtener los datos de la colección "viajes"
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String uid = user.getUid();
 
-                });
+            db.collection("users").document(uid).collection("viajes")
+                    .whereNotEqualTo("status", "finalizado")
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                            if (documents.size() > 0) {
+                                // Hay viajes en la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
+                                warningCard.setVisibility(View.GONE);
+                                list_trips_text.setVisibility(View.VISIBLE);
+                                loadTrips();
+                            } else {
+                                // No hay viajes en la colección "viajes" que no tengan el atributo "status" con valor "finalizado"
+                                warningCard.setVisibility(View.VISIBLE);
+                                LottieAnimationView animationView = findViewById(R.id.animation_view);
+                                animationView.cancelAnimation();
+                                animationView.setVisibility(View.GONE);
+                            }
+                        }  // Error al obtener los datos de la colección "viajes"
 
+                    });
+        }
 
-
-
-        // Configurar el DrawerLayout
+    // Configurar el DrawerLayout
         drawerLayout = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -91,6 +94,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Configurar el NavigationView
         NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
+        MenuItem menuItem = menu.findItem(R.id.sign_out);
+        SpannableString s = new SpannableString(menuItem.getTitle());
+        s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+        menuItem.setTitle(s);
         navigationView.setNavigationItemSelectedListener(item -> {
             // Cerrar el DrawerLayout al seleccionar una opción
             DrawerLayout drawer = findViewById(R.id.drawer_layout); // Utilizar el ID correcto del DrawerLayout
@@ -108,19 +116,27 @@ public class MainActivity extends AppCompatActivity {
                     Intent intentMapamundi = new Intent(MainActivity.this, MapamundiActivity.class);
                     startActivity(intentMapamundi);
                     return true;
-                case R.id.nav_settings:
+                case R.id.nav_profile:
                     // Iniciar la actividad FinishedTripsActivity al seleccionar la opción "Viajes finalizados"
-                    Intent intentSettings = new Intent(MainActivity.this, ConfigurationActivity.class);
+                    Intent intentSettings = new Intent(MainActivity.this, ProfileActivity.class);
                     startActivity(intentSettings);
                     return true;
+                case R.id.sign_out:
+                    // Cerrar la sesión del usuario
+                    FirebaseAuth.getInstance().signOut();
+                    // Iniciar la actividad ProfileActivity después de cerrar la sesión
+                    Intent intentLogin = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intentLogin);
+                    Toast.makeText(MainActivity.this, "Ha cerrado sesión correctamente", Toast.LENGTH_LONG).show();
+
+                    return true;
+
 
 
             }
 
             return false;
         });
-
-
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(
@@ -136,10 +152,10 @@ public class MainActivity extends AppCompatActivity {
                             Intent searchIntent = new Intent(MainActivity.this, MapamundiActivity.class);
                             startActivity(searchIntent);
                             return true;
-                        case R.id.bottom_nav_settings:
+                        case R.id.bottom_nav_profile:
                             // Acción para la pestaña "Perfil"
                             // Ejemplo: iniciar la actividad correspondiente
-                            Intent profileIntent = new Intent(MainActivity.this, ConfigurationActivity.class);
+                            Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);
                             startActivity(profileIntent);
                             return true;
                     }
@@ -354,7 +370,8 @@ public class MainActivity extends AppCompatActivity {
 
                 // Actualizar los datos del viaje en la base de datos de Firebase
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
-                db.collection("viajes").document(tripId)
+                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                db.collection("users").document(uid).collection("viajes").document(tripId)
                         .update(
                                 "destination", newDestination,
                                 "departureDate", newDepartureDate,
@@ -399,7 +416,7 @@ public class MainActivity extends AppCompatActivity {
             // Crear un AlertDialog para preguntar al usuario si ha finalizado el viaje
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             builder.setTitle("¿Ha finalizado este viaje?");
-            builder.setMessage("Si pulsa sobre \"Sí\" el viaje quedará guardado en \"Viajes finalizados\" y se quitará del menú principal. Además, quedará marcada la ubicación del viaje en tu Mapamundi.");
+            builder.setMessage("Si pulsa sobre \"Sí\" el viaje quedará guardado en \"Viajes finalizados\"");
             builder.setPositiveButton("Sí", (dialog, which) -> {
                 // TODO: Agregar código para completar el viaje y eliminarlo del menú principal
 
@@ -408,15 +425,14 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("destination", destination);
                 sendBroadcast(intent);
 
-
-
                 // Por ejemplo, puedes cambiar el estado del viaje a "finalizado" en la base de datos de Firestore
                 // y luego actualizar la interfaz de usuario para eliminar el Card del menú principal
 
                 // Cambiar el estado del viaje a "finalizado" en la base de datos de Firestore
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
-                DocumentReference tripRef = db.collection("viajes").document(tripId);
-                db.collection("viajes").document(tripId);
+                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                DocumentReference tripRef = db.collection("users").document(uid).collection("viajes").document(tripId);
+
                 tripRef.update("status", "finalizado")
                         .addOnSuccessListener(aVoid -> {
                             // Eliminar el CardView correspondiente al viaje de la pantalla principal
@@ -461,7 +477,8 @@ public class MainActivity extends AppCompatActivity {
 
                         // Eliminar el viaje de la base de datos de Firebase
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        db.collection("viajes").document(tripId)
+                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        db.collection("users").document(uid).collection("viajes").document(tripId)
                                 .delete()
                                 .addOnSuccessListener(aVoid -> {
 
@@ -482,7 +499,7 @@ public class MainActivity extends AppCompatActivity {
 
 // Agregar el LinearLayout al CardView
         cardContentLayout.addView(iconsLayout);
-
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         tripCard.setOnClickListener(view -> {
             // Aquí puedes agregar el código para abrir la nueva Activity
             Intent intent = new Intent(MainActivity.this, InfoTripActivity.class);
@@ -507,7 +524,8 @@ public class MainActivity extends AppCompatActivity {
         animationView.playAnimation();
 
         // Obtener todos los documentos de la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
-        db.collection("viajes")
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        db.collection("users").document(uid).collection("viajes")
                 .whereNotEqualTo("status", "finalizado")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -536,6 +554,5 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
-
 
 }

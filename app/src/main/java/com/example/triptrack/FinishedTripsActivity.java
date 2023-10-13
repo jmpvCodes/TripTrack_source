@@ -16,6 +16,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -40,8 +41,9 @@ public class FinishedTripsActivity extends AppCompatActivity {
         CardView warningCard = findViewById(R.id.warning_no_trips);
         warningCard.setVisibility(View.GONE);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        db.collection("viajes")
+        db.collection("users").document(uid).collection("viajes")
                 .whereEqualTo("status", "finalizado")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -95,10 +97,10 @@ public class FinishedTripsActivity extends AppCompatActivity {
                 Intent searchIntent = new Intent(FinishedTripsActivity.this, MapamundiActivity.class);
                 startActivity(searchIntent);
                 return true;
-            } else if (itemId == R.id.bottom_nav_settings) {
+            } else if (itemId == R.id.bottom_nav_my_trips) {
                 // Acción para la pestaña "Perfil"
                 // Ejemplo: iniciar la actividad correspondiente
-                Intent profileIntent = new Intent(FinishedTripsActivity.this, ConfigurationActivity.class);
+                Intent profileIntent = new Intent(FinishedTripsActivity.this, ProfileActivity.class);
                 startActivity(profileIntent);
                 return true;
             }

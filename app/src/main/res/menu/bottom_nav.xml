@@ -11,7 +11,7 @@
 			android:icon="@drawable/mundo" />
 
 	<item
-			android:id="@+id/bottom_nav_settings"
-			android:title="Configuración"
-			android:icon="@drawable/ic_settings" />
+			android:id="@+id/bottom_nav_profile"
+			android:title="Perfil"
+			android:icon="@drawable/person" />
 </menu>

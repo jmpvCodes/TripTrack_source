@@ -11,6 +11,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
@@ -54,10 +56,10 @@ public class CreatingNewTripActivity extends AppCompatActivity {
                 Intent searchIntent = new Intent(CreatingNewTripActivity.this, MapamundiActivity.class);
                 startActivity(searchIntent);
                 return true;
-            } else if (itemId == R.id.bottom_nav_settings) {
+            } else if (itemId == R.id.bottom_nav_profile) {
                 // Acción para la pestaña "Perfil"
                 // Ejemplo: iniciar la actividad correspondiente
-                Intent profileIntent = new Intent(CreatingNewTripActivity.this, ConfigurationActivity.class);
+                Intent profileIntent = new Intent(CreatingNewTripActivity.this, ProfileActivity.class);
                 startActivity(profileIntent);
                 return true;
             }
@@ -162,45 +164,51 @@ public class CreatingNewTripActivity extends AppCompatActivity {
         trip.put("price", price);
 
 
-    // Agregar un nuevo documento a la colección "viajes" con los datos del formulario
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("viajes")
-                .add(trip)
-                .addOnSuccessListener(documentReference -> {
-                    // El viaje se guardó correctamente
-                    Toast.makeText(CreatingNewTripActivity.this, "Viaje guardado", Toast.LENGTH_SHORT).show();
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                String uid = user.getUid();
 
-                    // Obtener el ID del documento de Firestore
-                    String tripId = documentReference.getId();
+                // Agregar un nuevo documento a la colección "viajes" del usuario con los datos del formulario
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("users").document(uid).collection("viajes")
+                        .add(trip)
+                        .addOnSuccessListener(documentReference -> {
+                            // El viaje se guardó correctamente
+                            Toast.makeText(CreatingNewTripActivity.this, "Viaje guardado", Toast.LENGTH_SHORT).show();
 
-                    // Actualizar el documento para agregar el campo tripId
-                    Map<String, Object> update = new HashMap<>();
-                    update.put("tripId", tripId);
-                    documentReference.update(update);
+                            // Obtener el ID del documento de Firestore
+                            String tripId = documentReference.getId();
 
-                    //Actualizar el documento para agregar el campo "status"
-                    Map<String, Object> update2 = new HashMap<>();
-                    update2.put("status", "Activo");
-                    documentReference.update(update2);
+                            // Actualizar el documento para agregar el campo tripId
+                            Map<String, Object> update = new HashMap<>();
+                            update.put("tripId", tripId);
+                            documentReference.update(update);
+
+                            //Actualizar el documento para agregar el campo "status"
+                            Map<String, Object> update2 = new HashMap<>();
+                            update2.put("status", "Activo");
+                            documentReference.update(update2);
 
 
-                    Intent intent = new Intent(CreatingNewTripActivity.this, MainActivity.class);
-                    intent.putExtra("destination", destination);
-                    intent.putExtra("departureDate", departureCalendar);
-                    intent.putExtra("returnDate", returnCalendar);
-                    intent.putExtra("peopleCount", peopleCount);
-                    intent.putExtra("price", price);
+                            Intent intent = new Intent(CreatingNewTripActivity.this, MainActivity.class);
+                            intent.putExtra("destination", destination);
+                            intent.putExtra("departureDate", departureCalendar);
+                            intent.putExtra("returnDate", returnCalendar);
+                            intent.putExtra("peopleCount", peopleCount);
+                            intent.putExtra("price", price);
 
-                    // Pasar el ID del viaje a la actividad MainActivity
-                    intent.putExtra("tripId", tripId);
+                            // Pasar el ID del viaje a la actividad MainActivity
+                            intent.putExtra("tripId", tripId);
 
-                    startActivity(intent);
-                })
-                .addOnFailureListener(e -> {
-                    // Ocurrió un error al guardar el viaje
-                    Toast.makeText(CreatingNewTripActivity.this, "Error al guardar el viaje", Toast.LENGTH_SHORT).show();
-                });
-    }
+                            startActivity(intent);
+                        })
+                        .addOnFailureListener(e -> {
+                            // Ocurrió un error al guardar el viaje
+                            Toast.makeText(CreatingNewTripActivity.this, "Error al guardar el viaje", Toast.LENGTH_SHORT).show();
+                        });
+            }
+
+        }
 
     private void showDatePickerDialog(final boolean isDeparture) {
         // Obtener la fecha actual

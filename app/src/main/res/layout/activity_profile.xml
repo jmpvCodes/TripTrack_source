@@ -46,135 +46,109 @@
 		<LinearLayout
 				android:layout_width="match_parent"
 				android:layout_height="570dp"
-				android:orientation="vertical">
+				android:orientation="vertical"
+				android:padding="16dp">
 
-			<!-- Configuración de idioma -->
 			<LinearLayout
-					android:layout_width="match_parent"
+					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:orientation="horizontal"
-			android:layout_margin="10dp">
+					android:padding="16dp">
 
+			<!-- Aquí es donde se mostraría el nombre del usuario -->
+			<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:textStyle="bold"
+					android:textSize="18dp"
+					android:text="Nombre: " />
+
+				<TextView
+						android:id="@+id/user_name"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text=" " />
+			</LinearLayout>
+
+			<!-- Aquí es donde se mostraría el apellido del usuario -->
+			<LinearLayout
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal"
+					android:padding="16dp">
+
+				<!-- Aquí es donde se mostraría el nombre del usuario -->
 				<TextView
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:text="Idioma" />
+						android:textStyle="bold"
+						android:textSize="18dp"
+						android:text="Apellido: " />
 
-				<Spinner
-						android:id="@+id/language_spinner"
+				<TextView
+						android:id="@+id/user_surname"
 						android:layout_width="wrap_content"
-						android:layout_height="wrap_content" />
-
+						android:layout_height="wrap_content"
+						android:text="" />
 			</LinearLayout>
 
-			<!-- Configuración de notificaciones push -->
+			<!-- Aquí es donde se mostraría el correo electrónico del usuario -->
 			<LinearLayout
-					android:layout_width="match_parent"
+					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:orientation="horizontal"
-					android:layout_margin="10dp">
+					android:padding="16dp">
 
+				<!-- Aquí es donde se mostraría el nombre del usuario -->
 				<TextView
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:text="Notificaciones Push" />
+						android:textStyle="bold"
+						android:textSize="18dp"
+						android:text="Correo electrónico: " />
 
-				<Switch
-						android:id="@+id/switch_push_notifications"
+				<TextView
+						android:id="@+id/user_email"
 						android:layout_width="wrap_content"
-						android:layout_height="wrap_content" />
-
+						android:layout_height="wrap_content"
+						android:text="" />
 			</LinearLayout>
 
-			<!-- Configuración de sincronización automática -->
+
+			<!-- Aquí es donde se mostraría el nivel del usuario -->
 			<LinearLayout
-					android:layout_width="match_parent"
+					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:orientation="horizontal"
-					android:layout_margin="10dp">
+					android:padding="16dp">
 
+				<!-- Aquí es donde se mostraría el nombre del usuario -->
 				<TextView
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:text="Sincronización Automática" />
-
-				<Switch
-						android:id="@+id/switch_auto_sync"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content" />
-
-			</LinearLayout>
-
-			<!-- Configuración de tamaño de fuente -->
-			<LinearLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:layout_margin="10dp">
+						android:textStyle="bold"
+						android:textSize="18dp"
+						android:text="Nivel: " />
 
 				<TextView
+						android:id="@+id/user_level"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:text="Tamaño de Fuente" />
-
-				<SeekBar
-						android:id="@+id/font_size_seekbar"
-						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:max="100"
-						android:progress="50" />
-
+						android:text=" " />
 			</LinearLayout>
 
-			<!-- Configuración de notificaciones por correo -->
-			<LinearLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:layout_margin="10dp">
-
-				<TextView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:text="Notificaciones por Correo" />
-
-				<Switch
-						android:id="@+id/switch_email_notifications"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content" />
-
-			</LinearLayout>
-
-			<!-- Configuración de seguridad -->
-			<LinearLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:layout_margin="10dp">
-
-				<TextView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:text="Seguridad" />
-
-			</LinearLayout>
-
-			<!-- Configuración de copia de seguridad -->
-			<LinearLayout
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:layout_margin="10dp">
-
-				<TextView
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:text="Copia de Seguridad" />
-
-
-			</LinearLayout>
+			<!-- Aquí es donde se mostraría la animación correspondiente al nivel del usuario -->
+			<com.airbnb.lottie.LottieAnimationView
+					android:id="@+id/level_animation"
+					android:padding="16dp"
+					android:layout_width="200dp"
+					android:layout_height="200dp"
+					android:layout_marginTop="50dp"
+					android:layout_centerHorizontal="true"
+					app:lottie_autoPlay="true" />
 
 		</LinearLayout>
+
 
 		<com.google.android.material.bottomnavigation.BottomNavigationView
 				android:id="@+id/bottom_navigation"

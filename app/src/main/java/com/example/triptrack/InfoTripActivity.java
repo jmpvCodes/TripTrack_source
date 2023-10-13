@@ -116,10 +116,10 @@ public class InfoTripActivity extends AppCompatActivity {
                         Intent searchIntent = new Intent(this, MapamundiActivity.class);
                         startActivity(searchIntent);
                         return true;
-                    } else if (itemId == R.id.bottom_nav_settings) {
+                    } else if (itemId == R.id.bottom_nav_my_trips) {
                         // Acción para la pestaña "Perfil"
                         // Ejemplo: iniciar la actividad correspondiente
-                        Intent profileIntent = new Intent(this, ConfigurationActivity.class);
+                        Intent profileIntent = new Intent(this, ProfileActivity.class);
                         startActivity(profileIntent);
                         return true;
                     }

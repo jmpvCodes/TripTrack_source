@@ -11,8 +11,8 @@
 			android:id="@+id/nav_my_world"
 			android:title="Mapamundi" />
 	<item
-			android:id="@+id/nav_settings"
-			android:title="Configuración" />
+			android:id="@+id/nav_profile"
+			android:title="Perfil" />
 
 	<item
 			android:id="@+id/sign_out"

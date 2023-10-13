@@ -46,6 +46,7 @@
 				android:layout_marginBottom="14dp"
 				android:orientation="vertical">
 
+
 			<com.google.android.material.textfield.TextInputLayout
 					android:id="@+id/nameText"
 					style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -138,7 +139,7 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:layout_marginTop="12dp"
-					android:layout_marginBottom="12dp"
+					android:layout_marginBottom="7dp"
 					android:text="REGISTRAR"
 					android:transitionName="SignUpButtonTrans"
 					app:backgroundTint="@color/purple_700"/>
@@ -151,11 +152,11 @@
 					android:clickable="true"
 					android:focusable="true"
 
-					android:minHeight="48dp"
+					android:minHeight="30dp"
 					android:text="¿Ya tienes una cuenta? Inicia sesión!"
 					android:textAlignment="center"
 					android:textColor="@color/purple_700"
-					android:textSize="20sp"
+					android:textSize="15sp"
 					android:textStyle="bold"
 					android:transitionName="OtherUsersTrans"
 					tools:backgroundTint="@color/purple_700"

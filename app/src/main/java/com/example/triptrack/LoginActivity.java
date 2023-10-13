@@ -1,15 +1,19 @@
 package com.example.triptrack;
 
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -17,30 +21,27 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import static android.content.ContentValues.TAG;
+
 public class LoginActivity extends AppCompatActivity {
 
-    TextView otherUsersText, welcomeLabel, headLabel;
+    TextView otherUsersText, welcomeLabel, headLabel, forgotPassText;
     ImageView logoImageView;
     TextInputLayout nameText, passwordText;
     MaterialButton SignUpButton;
     TextInputEditText emailEditText, passwordEditText;
     private FirebaseAuth mAuth;
-
-    //
-
-    SignInButton signInButton;
-    GoogleSignInClient mGoogleSignInClient;
     public static final int RC_SIGN_IN = 0;
 
 
@@ -58,6 +59,7 @@ public class LoginActivity extends AppCompatActivity {
         otherUsersText = findViewById(R.id.otherUsersText);
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
+        forgotPassText = findViewById(R.id.forgotPassText);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -85,59 +87,32 @@ public class LoginActivity extends AppCompatActivity {
                 finish();
             }
         });
-
         SignUpButton.setOnClickListener(v -> validate());
+        forgotPassText.setOnClickListener(v -> {
+            String emailAddress = emailEditText.getText().toString().trim();
 
-        signInButton = findViewById(R.id.loginGoogle);
+            mAuth.fetchSignInMethodsForEmail(emailAddress)
+                    .addOnCompleteListener(task -> {
+                        boolean isNewUser = task.getResult().getSignInMethods().isEmpty();
 
-        signInButton.setOnClickListener(v -> SignInWithGoogle());
+                        if (isNewUser) {
+                            emailEditText.setError("¡No se ha encontrado un correo electrónico registrado!");
+                            Toast.makeText(LoginActivity.this, "¡No se ha encontrado un correo electrónico registrado!", Toast.LENGTH_LONG).show();
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.web_client_id))
-                .requestEmail()
-                .build();
+                        } else {
+                            mAuth.sendPasswordResetEmail(emailAddress)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Toast.makeText(LoginActivity.this, "Email enviado", Toast.LENGTH_LONG).show();
 
-        mGoogleSignInClient = GoogleSignIn.getClient(this,gso);
-
-    }
-
-    private void SignInWithGoogle(){
-
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-
-    }
-
-    @Override
-    public void onActivityResult (int requestCode, int resultCode, Intent data) {
-
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == RC_SIGN_IN) {
-
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account.getId());
-            } catch (ApiException e) {
-                Toast.makeText(LoginActivity.this,"Fallo en el inicio de sesión con Google",Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    private void firebaseAuthWithGoogle(String idToken){
-
-        AuthCredential credencial = GoogleAuthProvider.getCredential(idToken,null);
-        mAuth.signInWithCredential(credencial)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()){
-                        Intent intent = new Intent (LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                    else{
-                        Toast.makeText(LoginActivity.this, "Fallo en iniciar la sesión. Inténtelo de nuevo.", Toast.LENGTH_LONG).show();
-                    }
-                });
+                                            }
+                                        }
+                                    });
+                        }
+                    });
+        });
 
     }
 
@@ -178,6 +153,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.signInWithEmailAndPassword(email,password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()){
+                        writePrefs();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
@@ -188,6 +164,20 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
 
+    }
+
+    private void writePrefs(){
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null) {
+            SharedPreferences prefs = getSharedPreferences("sharedPref", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("Nombre: ", user.getDisplayName());
+            editor.putString("Apellidos: ", user.getDisplayName());
+            editor.putString("Email: ", user.getEmail());
+            editor.apply();
+        }
     }
 
 
