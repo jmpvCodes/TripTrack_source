@@ -27,6 +27,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.*;
+import com.google.firebase.firestore.FirebaseFirestore;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -116,7 +117,7 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private void validate(){
+    private void validate() {
 
         String email = Objects.requireNonNull(emailEditText.getText()).toString().trim();
         String password = Objects.requireNonNull(passwordEditText.getText()).toString().trim();
@@ -124,62 +125,61 @@ public class LoginActivity extends AppCompatActivity {
         if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailEditText.setError("Correo inválido!");
             return;
-        }
-
-        else{
+        } else {
             emailEditText.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 8){
+        if (password.isEmpty() || password.length() < 8) {
             passwordEditText.setError("Se necesitan más de 8 caracteres");
             return;
-        }
-
-        else if (!Pattern.compile("[0-9]").matcher(password).find()){
+        } else if (!Pattern.compile("[0-9]").matcher(password).find()) {
             passwordEditText.setError("Se necesita al menos un número");
             return;
-        }
-
-        else {
+        } else {
             passwordEditText.setError(null);
         }
 
-        startSession(email,password);
+        startSession(email, password);
 
     }
 
-    private void startSession(String email, String password){
+    private void startSession(String email, String password) {
 
-        mAuth.signInWithEmailAndPassword(email,password)
+        mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         writePrefs();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
-                    }
-
-                    else{
+                    } else {
                         Toast.makeText(LoginActivity.this, "Credenciales incorrectas. Intentalo de nuevo.", Toast.LENGTH_LONG).show();
                     }
                 });
 
     }
 
-    private void writePrefs(){
+    private void writePrefs() {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
         if (user != null) {
-            SharedPreferences prefs = getSharedPreferences("sharedPref", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString("Nombre: ", user.getDisplayName());
-            editor.putString("Apellidos: ", user.getDisplayName());
-            editor.putString("Email: ", user.getEmail());
-            editor.apply();
+            String uid = user.getUid();
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("users").document(uid).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        String name = documentSnapshot.getString("Nombre: ");
+                        String surname = documentSnapshot.getString("Apellidos: ");
+                        SharedPreferences prefs = getSharedPreferences("sharedPref", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("Nombre: ", name);
+                        editor.putString("Apellidos: ", surname);
+                        editor.putString("Email: ", user.getEmail());
+                        editor.apply();
+                    });
+
         }
+
     }
-
-
 
 }

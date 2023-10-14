@@ -40,6 +40,12 @@ public class ProfileActivity extends AppCompatActivity {
 
         TextView userLevel = findViewById(R.id.user_level);
 
+        TextView congratulationsMessage = findViewById(R.id.congratText);
+
+        int completedTrips = 10; // Reemplaza esto con el número de viajes completados
+
+        int remainingTrips = 5; // Reemplaza esto con el número de viajes restantes para subir de nivel
+
 // Aquí es donde determinarías el nivel del usuario y cargarías la animación correspondiente
         LottieAnimationView levelAnimation = findViewById(R.id.level_animation);
         String level = "2"; // Reemplaza esto con el nivel del usuario
@@ -49,10 +55,13 @@ public class ProfileActivity extends AppCompatActivity {
             case "1":
                 levelAnimation.setAnimation(R.raw.level1);
                 levelAnimation.setRepeatCount(LottieDrawable.INFINITE);
+                congratulationsMessage.setText("Enhorabuena. Aún eres un viajero novato has realizado " + completedTrips + " viajes, completa " + remainingTrips + " más para subir de nivel!");
                 break;
             case "2":
                 levelAnimation.setAnimation(R.raw.level2);
                 levelAnimation.setRepeatCount(LottieDrawable.INFINITE);
+                congratulationsMessage.setText("Enhorabuena. Aún eres un viajero principiante has realizado " + completedTrips + " viajes, completa " + remainingTrips + " más para subir de nivel!");
+
                 break;
                 default:
                 // Código para ejecutar si no se encuentra ningún caso

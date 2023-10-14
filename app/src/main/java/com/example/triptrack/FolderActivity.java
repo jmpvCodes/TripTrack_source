@@ -47,19 +47,12 @@ public class FolderActivity extends AppCompatActivity {
     private ImageAdapter adapter;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
-
-        ImageButton backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> onBackPressed());
+        generateToolbar(); // Generar la barra de herramientas
 
         String tripId = getIntent().getStringExtra("tripId");
         String folderName = getIntent().getStringExtra("folderName");
@@ -230,35 +223,7 @@ public class FolderActivity extends AppCompatActivity {
             }
         });
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnItemSelectedListener(
-                (BottomNavigationView.OnNavigationItemSelectedListener) item -> {
-                    // Obtener el ID del item seleccionado
-                    int itemId = item.getItemId();
-
-                    // Realizar acciones basadas en el item seleccionado
-                    if (itemId == R.id.nav_my_trips) {
-                        // Acción para la pestaña "Buscar"
-                        // Ejemplo: iniciar la actividad correspondiente
-                        Intent mainIntent = new Intent(FolderActivity.this, MainActivity.class);
-                        startActivity(mainIntent);
-                        return true;
-                    } else if (itemId == R.id.bottom_nav_world) {
-                        // Acción para la pestaña "Buscar"
-                        // Ejemplo: iniciar la actividad correspondiente
-                        Intent searchIntent = new Intent(FolderActivity.this, MapamundiActivity.class);
-                        startActivity(searchIntent);
-                        return true;
-                    } else if (itemId == R.id.bottom_nav_profile) {
-                        // Acción para la pestaña "Perfil"
-                        // Ejemplo: iniciar la actividad correspondiente
-                        Intent profileIntent = new Intent(FolderActivity.this, ProfileActivity.class);
-                        startActivity(profileIntent);
-                        return true;
-                    }
-
-                    return false;
-                });
+        generateBottomNavigation(); // Generar la barra de navegación
 
     }
 

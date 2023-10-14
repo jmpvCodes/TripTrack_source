@@ -21,32 +21,32 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link AlbumTabFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Fragmento que muestra la lista de carpetas de una galería de fotos.
+ * Este fragmento se utiliza en la pestaña "Álbum" de la actividad principal.
  */
 public class AlbumTabFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    // TODO: Renombrar los argumentos de los parámetros y elegir nombres que coincidan
+    // con los parámetros de inicialización del fragmento, por ejemplo, ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
 
     public AlbumTabFragment() {
-        // Required empty public constructor
+        // Constructor público vacío requerido por el sistema
     }
 
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
+     * Método de fábrica para crear una nueva instancia de este fragmento
+     * utilizando los parámetros proporcionados.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AlbumTabFragment.
+     * @param param1 Parámetro 1.
+     * @param param2 Parámetro 2.
+     * @return Una nueva instancia del fragmento AlbumTabFragment.
      */
-    // TODO: Rename and change types and number of parameters
+    // TODO: Renombrar y cambiar los tipos y el número de parámetros según sea necesario
     public static AlbumTabFragment newInstance(String param1, String param2) {
         AlbumTabFragment fragment = new AlbumTabFragment();
         Bundle args = new Bundle();
@@ -59,20 +59,28 @@ public class AlbumTabFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // TODO: Rename and change types of parameters
+        // TODO: Cambiar los tipos de los parámetros según sea necesario
     }
 
+    /**
+     * Crea y devuelve la vista inflada para este fragmento.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Inflar el diseño para este fragmento
         return inflater.inflate(R.layout.fragment_album_tab, container, false);
     }
 
+    /**
+     * Se llama inmediatamente después de que onCreateView(LayoutInflater, ViewGroup, Bundle)
+     * haya creado la vista inflada para este fragmento.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Obtener las vistas necesarias
         LottieAnimationView lottieAnimationView1 = view.findViewById(R.id.lottieAnimationView);
         TextView messageTextView = view.findViewById(R.id.messageTextView);
 

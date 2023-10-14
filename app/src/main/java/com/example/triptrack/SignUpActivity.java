@@ -40,6 +40,34 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
 
     @SuppressLint("MissingInflatedId")
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sign_up);
+
+        signUpImageView = findViewById(R.id.signUpImageView);
+        welcomeLabel = findViewById(R.id.welcomeLabel);
+        headLabel = findViewById(R.id.headLabel);
+        nameText = findViewById(R.id.nameText);
+        nameInputText = findViewById(R.id.nameInputText);
+        surnameText =findViewById(R.id.surnameText);
+        surnameInputText=findViewById(R.id.surnameInputText);
+        passwordText = findViewById(R.id.passwordText);
+        SignUpButton = findViewById(R.id.SignUpButton);
+        otherUsersText = findViewById(R.id.otherUsersText);
+        emailEditText = findViewById(R.id.emailEditText);
+        passwordEditText = findViewById(R.id.passwordEditText);
+        confirmPasswordEditText = findViewById(R.id.confirmPasswordEditText);
+
+        otherUsersText.setOnClickListener(v -> transitionBack());
+
+        SignUpButton.setOnClickListener(v -> {
+            validate();
+
+        });
+        mAuth = FirebaseAuth.getInstance();
+    }
+
     private void register(String email, String password){
 
         mAuth.createUserWithEmailAndPassword(email,password)
@@ -67,6 +95,7 @@ public class SignUpActivity extends AppCompatActivity {
                             Map<String, Object> userData = new HashMap<>();
                             userData.put("Nombre: ", nameInputText.getText().toString());
                             userData.put("Apellidos: ", surnameInputText.getText().toString());
+                            userData.put("Email: ",emailEditText.getText().toString());
                             db.collection("users").document(user.getUid()).set(userData);
                         }
 
@@ -83,6 +112,44 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
+    private void validate () {
+
+        String email = Objects.requireNonNull(emailEditText.getText()).toString().trim();
+        String password = Objects.requireNonNull(passwordEditText.getText()).toString().trim();
+        String confirmpassword = Objects.requireNonNull(confirmPasswordEditText.getText()).toString().trim();
+
+        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailEditText.setError("Correo inválido!");
+            return;
+        }
+
+        else{
+            emailEditText.setError(null);
+        }
+
+        if (password.isEmpty() || password.length() < 8){
+            passwordEditText.setError("Se necesitan más de 8 caracteres");
+            return;
+        }
+
+        else if (!Pattern.compile("[0-9]").matcher(password).find()){
+            passwordEditText.setError("Se necesita al menos un número");
+            return;
+        }
+
+        else {
+            passwordEditText.setError(null);
+        }
+
+        if (!confirmpassword.equals(password)){
+            confirmPasswordEditText.setError("Las contraseñas no coinciden. Compruébalo de nuevo!");
+        }
+
+        else{
+            confirmPasswordEditText.setError(null);
+            register(email,password);
+        }
+    }
 
     @Override
     public void onBackPressed() {

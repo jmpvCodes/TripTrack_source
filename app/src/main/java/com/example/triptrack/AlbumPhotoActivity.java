@@ -15,21 +15,29 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.Objects;
 
+/**
+ * Esta actividad muestra un álbum de fotos para un viaje específico.
+ * La actividad tiene una barra de herramientas en la parte superior y una barra de navegación en la parte inferior.
+ * En el medio, hay un TabLayout con dos pestañas: "Galería" y "Álbum".
+ * Cada pestaña muestra un fragmento diferente.
+ */
+
 public class AlbumPhotoActivity extends AppCompatActivity {
+
+    /**
+     * Este método se llama cuando se crea la actividad.
+     * Configura la barra de herramientas, el botón de retroceso, el TabLayout, el ViewPager y la barra de navegación.
+     *
+     * @param savedInstanceState Si la actividad se reinicia después de una pausa, este parámetro contiene los datos más recientes.
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_photo);
 
-        // Configurar la barra de herramientas
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
-
-        // Configurar el botón de retroceso
-        ImageButton backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> onBackPressed());
+        // Generar la barra de herramientas
+        generateToolbar(); 
 
         // Obtener el ID del viaje
         String tripId = getIntent().getStringExtra("tripId");
@@ -42,7 +50,7 @@ public class AlbumPhotoActivity extends AppCompatActivity {
         // Configurar el ViewPager
         ViewPager viewPager = findViewById(R.id.view_pager);
 
-        // Crear un adaptador para el ViewPager
+        // Crear un FragmentPagerAdapter que muestre el fragmento correcto para cada pestaña
         FragmentPagerAdapter adapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             @NonNull
             @Override
@@ -74,12 +82,22 @@ public class AlbumPhotoActivity extends AppCompatActivity {
             }
         };
 
+        // Configurar el ViewPager para que se actualice cuando el TabLayout cambie de pestaña
         viewPager.setAdapter(adapter);
 
-        // Conectar el TabLayout con el ViewPager
+        // Configurar el TabLayout para que se actualice cuando el ViewPager cambie de página
         tabLayout.setupWithViewPager(viewPager);
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        // Generar la barra de navegación
+        generateBottomNavigation(); 
+
+       
+    }
+
+    public void generateBottomNavigation() {
+
+
+         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(
                 (BottomNavigationView.OnNavigationItemSelectedListener) item -> {
                     // Obtener el ID del item seleccionado
@@ -109,5 +127,17 @@ public class AlbumPhotoActivity extends AppCompatActivity {
                     return false;
                 });
 
+
+    }
+
+    public void generateToolbar() {
+      // Configurar la barra de herramientas
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+
+        // Configurar el botón de retroceso
+        ImageButton backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> onBackPressed());
     }
 }
