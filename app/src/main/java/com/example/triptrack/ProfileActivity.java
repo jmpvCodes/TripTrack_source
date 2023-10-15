@@ -14,6 +14,13 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.Objects;
+
+/**
+ * Esta clase representa la actividad Perfil.
+ * Esta actividad muestra el perfil del usuario.
+ * Muestra el nombre, los apellidos, el correo electrónico, el nivel y la animación del nivel del usuario.
+ */
 public class ProfileActivity extends AppCompatActivity {
 
     @Override
@@ -21,13 +28,49 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        generacionToolbar(); //Generación de Toolbar
-        generacionBottomNavigationBar(); //Generación BottomNavigationBar
+        // Configurar la barra de herramientas
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+
+        // Configurar el botón de retroceso
+        ImageButton backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> onBackPressed()); //Generación de Toolbar
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnItemSelectedListener(
+                (BottomNavigationView.OnNavigationItemSelectedListener) item -> {
+                    // Obtener el ID del item seleccionado
+                    int itemId = item.getItemId();
+
+                    // Realizar acciones basadas en el item seleccionado
+                    if (itemId == R.id.nav_my_trips) {
+                        // Acción para la pestaña "Buscar"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent mainIntent = new Intent(this, MainActivity.class);
+                        startActivity(mainIntent);
+                        return true;
+                    } else if (itemId == R.id.bottom_nav_world) {
+                        // Acción para la pestaña "Buscar"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent searchIntent = new Intent(this, MapamundiActivity.class);
+                        startActivity(searchIntent);
+                        return true;
+                    } else if (itemId == R.id.bottom_nav_profile) {
+                        // Acción para la pestaña "Perfil"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent profileIntent = new Intent(this, ProfileActivity.class);
+                        startActivity(profileIntent);
+                        return true;
+                    }
+
+                    return false;
+                }); //Generación BottomNavigationBar
 
         SharedPreferences sharedPref = getSharedPreferences("sharedPref", Context.MODE_PRIVATE);
         String email = sharedPref.getString("Email: ", "");
         String name = sharedPref.getString("Nombre: ", "");
         String surname = sharedPref.getString("Apellidos: ", "");
+
 
         TextView userName = findViewById(R.id.user_name);
         userName.setText(name);

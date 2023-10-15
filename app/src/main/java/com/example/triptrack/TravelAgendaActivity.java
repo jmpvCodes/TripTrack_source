@@ -19,6 +19,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Esta clase representa la actividad Agenda de viaje.
+ * Esta actividad muestra un calendario y una lista de planes programados.
+ * El usuario puede agregar planes a un día seleccionado en el calendario.
+ */
 public class TravelAgendaActivity extends AppCompatActivity {
 
     private String tripId;
@@ -28,17 +33,24 @@ public class TravelAgendaActivity extends AppCompatActivity {
     private final List<DayViewDecorator> decorators = new ArrayList<>();
     final ArrayList<Plans> scheduledPlans = new ArrayList<>();
 
+
+    /**
+     * Método que se ejecuta cuando se crea la actividad.
+     * @param savedInstanceState estado de la instancia
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_travel_agenda);
 
+        // Configurar la barra de herramientas
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
+        // Configurar el botón de retroceso
         ImageButton backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> onBackPressed());
+        backButton.setOnClickListener(v -> onBackPressed());;
 
         tripId = getIntent().getStringExtra("tripId");
 
@@ -100,7 +112,9 @@ public class TravelAgendaActivity extends AppCompatActivity {
         updateScheduledPlansList();
     }
 
-
+    /**
+     * Método que muestra un cuadro de diálogo para agregar un nuevo plan.
+     */
     private void showAddPlanDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Agregar nuevo plan");
@@ -177,6 +191,10 @@ public class TravelAgendaActivity extends AppCompatActivity {
 
         builder.show();
     }
+
+    /**
+     * Método que actualiza la lista de planes programados.
+     */
     public void updateScheduledPlansList() {
 
         // Obtener la fecha seleccionada usando el método getSelectedDate()
@@ -219,6 +237,12 @@ public class TravelAgendaActivity extends AppCompatActivity {
             updateCalendarView(scheduledPlans, calendarView);
         }
     }
+
+    /**
+     * Método que actualiza el MaterialCalendarView para mostrar los círculos en cada día.
+     * @param scheduledPlans lista de planes programados
+     * @param calendarView MaterialCalendarView
+     */
     private void updateCalendarView(@NotNull List<Plans> scheduledPlans, MaterialCalendarView calendarView) {
         // Eliminar solo los decoradores de PlanDayDecorator
         for (DayViewDecorator decorator : decorators) {
@@ -255,6 +279,11 @@ public class TravelAgendaActivity extends AppCompatActivity {
             calendarView.addDecorator(decorator);
         }
     }
+
+    /**
+     * Método para cargar los planes de un viaje desde el archivo plans.txt.
+     * @param tripId el ID del viaje
+     */
     private void loadPlans(String tripId) {
         Log.d("TravelAgendaActivity", "Loading plans for tripId: " + tripId);
         try {
@@ -297,6 +326,10 @@ public class TravelAgendaActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Método para guardar los planes en el archivo plans.txt.
+     */
     public void savePlans() {
         try {
             File plansDir = new File(getFilesDir(), "Planes");
@@ -325,6 +358,11 @@ public class TravelAgendaActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Método para eliminar un plan de la lista de planes programados.
+     * @param plan el plan que se va a eliminar
+     */
     public void deletePlan(Plans plan) {
         // Eliminar el plan de la lista de planes programados
         scheduledPlans.remove(plan);
@@ -333,6 +371,10 @@ public class TravelAgendaActivity extends AppCompatActivity {
         savePlans();
         updateScheduledPlansList();
     }
+
+    /**
+     * Método para borrar todos los planes de la lista de planes programados.
+     */
     private void cleanAllPlans() {
         // Borrar todos los planes de la lista scheduledPlans
         scheduledPlans.clear();

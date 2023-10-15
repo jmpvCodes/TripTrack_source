@@ -18,36 +18,51 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
+/**
+ * Esta clase representa la pantalla de importación de documentos.
+ * Permite al usuario importar documentos de su dispositivo y guardarlos en el almacenamiento interno de la aplicación.
+ * Los documentos se muestran en una lista y se pueden abrir en otras aplicaciones.
+ */
+
 public class ImportDocumentsActivity extends AppCompatActivity {
 
-    private RadioGroup documentTypeRadioGroup;
-    private static final int READ_REQUEST_CODE = 42;
-    private String selectedMimeType;
+    // Declaración de variables
+    private RadioGroup documentTypeRadioGroup; // Grupo de botones de radio para seleccionar el tipo de documento
+    private static final int READ_REQUEST_CODE = 42; // Código de solicitud para la selección de documentos
+    private String selectedMimeType; // Tipo MIME seleccionado
+    private DocumentAdapter documentAdapter; // Adaptador para la lista de documentos
 
-    private DocumentAdapter documentAdapter;
-
+    /**
+     * Método que se llama cuando se crea la actividad.
+     * @param savedInstanceState estado de la instancia guardada
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_import_documents);
 
+        // Configurar la barra de herramientas
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
+        // Configurar el botón de retroceso
         ImageButton backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> onBackPressed());
+        backButton.setOnClickListener(v -> onBackPressed());; // Generar la barra de herramientas
 
         documentTypeRadioGroup = findViewById(R.id.document_type_radio_group);
 
+
+        // Obtener una referencia al botón de importación y establecer un listener para él
         Button importButton = findViewById(R.id.import_button);
         importButton.setOnClickListener(v -> performFileSearch());
 
+        // Obtener una referencia a la lista de documentos y crear un adaptador para ella
         ListView documentListView = findViewById(R.id.document_list_view);
         documentAdapter = new DocumentAdapter(this, new ArrayList<>());
         documentListView.setAdapter(documentAdapter);
 
-        String tripId = getIntent().getStringExtra("tripId");
+        String tripId = getIntent().getStringExtra("tripId"); // Obtener el ID del viaje
 
 
         // Leer los archivos del almacenamiento interno y agregarlos al adaptador
@@ -62,6 +77,10 @@ public class ImportDocumentsActivity extends AppCompatActivity {
             documentAdapter.notifyDataSetChanged();
         }
 
+        /*
+         * Establecer un listener para la lista de documentos.
+         * Cuando se hace clic en un elemento de la lista, se abre el archivo correspondiente en otra aplicación.
+         */
         documentListView.setOnItemClickListener((parent, view, position, id) -> {
             Document document = documentAdapter.getItem(position);
             File file = new File(document.getPath());
@@ -72,6 +91,13 @@ public class ImportDocumentsActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
+        
+    /**
+     * Obtiene el tipo MIME de un archivo. 
+     * @see <a href="https://developer.android.com/training/secure-file-sharing/retrieve-info">Recuperar información de un archivo</a>
+     * @param file archivo del que se va a obtener el tipo MIME
+     * @return el tipo MIME del archivo
+     */
         private String getMimeType (File file){
             String mimeType = null;
             String fileName = file.getName();
@@ -84,12 +110,18 @@ public class ImportDocumentsActivity extends AppCompatActivity {
         }
 
 
-
+        /**
+         * Crea un intento de selección de documentos y lo envía a la actividad apropiada.
+         * El resultado de la actividad se recibe en onActivityResult.
+         */
         private void performFileSearch() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
 
-        int checkedRadioButtonId = documentTypeRadioGroup.getCheckedRadioButtonId();
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT); // Crear un intento de selección de documentos
+        intent.addCategory(Intent.CATEGORY_OPENABLE); // Establecer la categoría del intento
+
+        int checkedRadioButtonId = documentTypeRadioGroup.getCheckedRadioButtonId();   // Obtener el ID del botón de radio seleccionado
+
+        // Establecer el tipo MIME del intento en función del botón de radio seleccionado
         switch (checkedRadioButtonId) {
             case R.id.pdf_radio_button:
                 selectedMimeType = "application/pdf";
@@ -112,13 +144,23 @@ public class ImportDocumentsActivity extends AppCompatActivity {
         }
         intent.setType(selectedMimeType);
 
-        startActivityForResult(intent, READ_REQUEST_CODE);
+        startActivityForResult(intent, READ_REQUEST_CODE); 
     }
 
+    /**
+     * Se llama cuando se recibe el resultado de una actividad. El resultado se recibe en forma de intento. 
+     * Se comprueba si el resultado es de la actividad de selección de documentos y se obtiene el URI del archivo seleccionado.
+     * @param requestCode codigo de solicitud de la actividad
+     * @param resultCode codigo de resultado de la actividad
+     * @param resultData resultado de la actividad
+     * @see <a href="https://developer.android.com/training/basics/intents/result">Cómo obtener un resultado de una actividad</a>
+     */
     @SuppressLint("Range")
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         super.onActivityResult(requestCode, resultCode, resultData);
+
+        // Comprobar si el resultado es de la actividad de selección de documentos
         if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             Uri uri;
             if (resultData != null) {
@@ -143,13 +185,16 @@ public class ImportDocumentsActivity extends AppCompatActivity {
 
                 // Guardar el archivo en el almacenamiento interno
                 if (fileName != null) {
+                    
                     String tripId = getIntent().getStringExtra("tripId");
-                    File directory = new File(getFilesDir(), "viajes/" + tripId);
+                    File directory = new File(getFilesDir(), "viajes/" + tripId); // Crear un directorio para el viaje si no existe
                     if (!directory.exists()) {
                         directory.mkdirs();
                     }
                     File file = new File(directory, fileName);
                     try {
+
+                        // Copiar el archivo seleccionado en el almacenamiento interno
                         InputStream inputStream = getContentResolver().openInputStream(uri);
                         OutputStream outputStream = new FileOutputStream(file);
                         byte[] buffer = new byte[1024];

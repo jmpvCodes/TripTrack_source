@@ -21,9 +21,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link BudgetTabFragment #newInstance} factory method to
- * create an instance of this fragment.
+ * Esta clase es un fragmento que se utiliza para mostrar la pestaña de presupuesto.
  */
 public class BudgetTabFragment extends Fragment {
 
@@ -43,6 +41,9 @@ public class BudgetTabFragment extends Fragment {
     private Button addExpenseButton;
     private double budget = 0.0; // Presupuesto inicial
 
+    /**
+     * Constructor vacío requerido por la clase Fragment
+     */
     public BudgetTabFragment() {
         // Required empty public constructor
     }

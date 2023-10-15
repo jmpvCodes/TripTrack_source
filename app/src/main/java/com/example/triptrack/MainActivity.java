@@ -31,12 +31,19 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Esta clase representa la pantalla principal de la aplicación.
+ */
 public class MainActivity extends AppCompatActivity {
 
-    private DrawerLayout drawerLayout;
-
+    // Declaración de variables
+    private DrawerLayout drawerLayout; 
     private TextView list_trips_text;
 
+    /**
+     * Método que se ejecuta cuando se crea la actividad
+     * @param savedInstanceState estado de la instancia guardada
+     */
     @SuppressLint({"NonConstantResourceId", "CutPasteId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,16 +59,25 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu); // Icono para abrir el drawer
         }
+
+        // Ocultar el título de la actividad
         CardView warningCard = findViewById(R.id.warning_no_trips);
         warningCard.setVisibility(View.GONE);
 
+        // Ocultar el texto "No hay viajes"
         list_trips_text = findViewById(R.id.list_trips_text);
+
+        // Obtener una referencia a la base de datos
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+        // Obtener el ID del usuario actual
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        // Verificar si el usuario ha iniciado sesión
         if (user != null) {
             String uid = user.getUid();
 
+            // Obtener todos los documentos de la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
             db.collection("users").document(uid).collection("viajes")
                     .whereNotEqualTo("status", "finalizado")
                     .get()
@@ -85,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                     });
         }
 
-    // Configurar el DrawerLayout
+        // Configurar el DrawerLayout
         drawerLayout = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -95,13 +111,15 @@ public class MainActivity extends AppCompatActivity {
         // Configurar el NavigationView
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
+
+        // Cambiar el color del texto de la opción "Cerrar sesión"
         MenuItem menuItem = menu.findItem(R.id.sign_out);
-        SpannableString s = new SpannableString(menuItem.getTitle());
-        s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+        SpannableString s = new SpannableString(menuItem.getTitle()); 
+        s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0); 
         menuItem.setTitle(s);
         navigationView.setNavigationItemSelectedListener(item -> {
             // Cerrar el DrawerLayout al seleccionar una opción
-            DrawerLayout drawer = findViewById(R.id.drawer_layout); // Utilizar el ID correcto del DrawerLayout
+            DrawerLayout drawer = findViewById(R.id.drawer_layout); 
             drawer.closeDrawer(GravityCompat.START);
 
             // Manejar la selección de opciones del menú
@@ -140,28 +158,33 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(
-                item -> {
+                (BottomNavigationView.OnNavigationItemSelectedListener) item -> {
                     // Obtener el ID del item seleccionado
                     int itemId = item.getItemId();
 
                     // Realizar acciones basadas en el item seleccionado
-                    switch (itemId) {
-                        case R.id.bottom_nav_world:
-                            // Acción para la pestaña "Buscar"
-                            // Ejemplo: iniciar la actividad correspondiente
-                            Intent searchIntent = new Intent(MainActivity.this, MapamundiActivity.class);
-                            startActivity(searchIntent);
-                            return true;
-                        case R.id.bottom_nav_profile:
-                            // Acción para la pestaña "Perfil"
-                            // Ejemplo: iniciar la actividad correspondiente
-                            Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);
-                            startActivity(profileIntent);
-                            return true;
+                    if (itemId == R.id.nav_my_trips) {
+                        // Acción para la pestaña "Buscar"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent mainIntent = new Intent(this, MainActivity.class);
+                        startActivity(mainIntent);
+                        return true;
+                    } else if (itemId == R.id.bottom_nav_world) {
+                        // Acción para la pestaña "Buscar"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent searchIntent = new Intent(this, MapamundiActivity.class);
+                        startActivity(searchIntent);
+                        return true;
+                    } else if (itemId == R.id.bottom_nav_profile) {
+                        // Acción para la pestaña "Perfil"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent profileIntent = new Intent(this, ProfileActivity.class);
+                        startActivity(profileIntent);
+                        return true;
                     }
 
                     return false;
-                });
+                }); // Generar la barra de navegación
 
 
         // Configurar las Cards para crear un nuevo viaje y consultar un viaje
@@ -169,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
         ImageView iconImageView = findViewById(R.id.new_trip);
         iconImageView.setImageResource(R.drawable.new_trip);
 
+        // Agregar un OnClickListener a la Card para crear un nuevo viaje
         createTripCard.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, CreatingNewTripActivity.class);
             startActivity(intent);
@@ -190,9 +214,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // Abrir o cerrar el drawer cuando se presiona el ícono de la appbar
+    /**
+     * Método que se ejecuta cuando se selecciona un elemento del menú de la barra de herramientas.
+     * @param item elemento del menú seleccionado
+     * @return true si el elemento del menú se ha seleccionado correctamente, false en caso contrario
+     */    
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        // Manejar los clicks en los elementos del menú de la barra de herramientas
         if (item.getItemId() == android.R.id.home) {
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 drawerLayout.closeDrawer(GravityCompat.START);
@@ -204,6 +234,16 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Método que crea un CardView para mostrar los datos de un viaje en la pantalla principal.  
+     * @param destination destino del viaje
+     * @param departureDate fecha de ida del viaje
+     * @param returnDate fecha de vuelta del viaje
+     * @param peopleCount número de personas que viajan
+     * @param price precio del viaje
+     * @param tripId ID del viaje
+     * @see <a href="https://developer.android.com/guide/topics/ui/layout/cardview">CardView</a>
+     */
     @SuppressLint("ResourceAsColor")
     private void addTripCard(String destination, String departureDate, String returnDate, String peopleCount, String price, String tripId) {
         // Crear un nuevo CardView
@@ -515,6 +555,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Es un método que carga los viajes del usuario actual en la pantalla principal. 
+     * Se obtienen todos los documentos de la colección "viajes" que no tienen el atributo "status" con valor "finalizado".
+     * Si no hay viajes, se muestra un mensaje al usuario.
+     */
     private void loadTrips() {
         // Obtener una referencia a la base de datos
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -526,7 +571,8 @@ public class MainActivity extends AppCompatActivity {
         // Obtener todos los documentos de la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         db.collection("users").document(uid).collection("viajes")
-                .whereNotEqualTo("status", "finalizado")
+                
+                .whereNotEqualTo("status", "finalizado") // Filtrar los viajes que no tienen el atributo "status" con valor "finalizado"
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

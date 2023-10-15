@@ -27,6 +27,11 @@ import java.util.Date;
 import java.util.Objects;
 
 
+/**
+ * Esta actividad muestra una carpeta de la galería de un viaje específico.
+ * La actividad tiene una barra de herramientas en la parte superior y una barra de navegación en la parte inferior.
+ * En el medio, hay un GridView que muestra las imágenes y videos de la carpeta.
+ */
 public class FolderActivity extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -52,7 +57,14 @@ public class FolderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder);
 
-        generateToolbar(); // Generar la barra de herramientas
+        // Configurar la barra de herramientas
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+
+        // Configurar el botón de retroceso
+        ImageButton backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> onBackPressed());; // Generar la barra de herramientas
 
         String tripId = getIntent().getStringExtra("tripId");
         String folderName = getIntent().getStringExtra("folderName");
@@ -223,7 +235,35 @@ public class FolderActivity extends AppCompatActivity {
             }
         });
 
-        generateBottomNavigation(); // Generar la barra de navegación
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnItemSelectedListener(
+                (BottomNavigationView.OnNavigationItemSelectedListener) item -> {
+                    // Obtener el ID del item seleccionado
+                    int itemId = item.getItemId();
+
+                    // Realizar acciones basadas en el item seleccionado
+                    if (itemId == R.id.nav_my_trips) {
+                        // Acción para la pestaña "Buscar"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent mainIntent = new Intent(this, MainActivity.class);
+                        startActivity(mainIntent);
+                        return true;
+                    } else if (itemId == R.id.bottom_nav_world) {
+                        // Acción para la pestaña "Buscar"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent searchIntent = new Intent(this, MapamundiActivity.class);
+                        startActivity(searchIntent);
+                        return true;
+                    } else if (itemId == R.id.bottom_nav_profile) {
+                        // Acción para la pestaña "Perfil"
+                        // Ejemplo: iniciar la actividad correspondiente
+                        Intent profileIntent = new Intent(this, ProfileActivity.class);
+                        startActivity(profileIntent);
+                        return true;
+                    }
+
+                    return false;
+                }); // Generar la barra de navegación
 
     }
 

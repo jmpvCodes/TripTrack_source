@@ -8,19 +8,38 @@ import androidx.appcompat.app.AlertDialog;
 
 import java.util.ArrayList;
 
+/**
+ * Esta clase representa un adaptador para la lista de planes programados.
+ * Se utiliza para mostrar los planes programados en la lista de planes programados.
+ */
 public class PlansAdapter extends ArrayAdapter<Plans> {
-    private final TravelAgendaActivity activity;
 
+    private final TravelAgendaActivity activity; // Actividad que utiliza el adaptador
+
+    /**
+     * Método constructor de la clase.
+     * Crea un adaptador para la lista de planes programados.
+     * @param activity actividad que utiliza el adaptador
+     * @param plans lista de planes programados
+     */
     public PlansAdapter(TravelAgendaActivity activity, ArrayList<Plans> plans) {
         super(activity, 0, plans);
         this.activity = activity;
     }
 
+    /**
+     * Método para obtener la vista de un elemento de la lista.
+     * @param position posición del elemento en la lista
+     * @param convertView vista del elemento
+     * @param parent vista padre
+     * @return vista del elemento
+     */
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_plan, parent, false);
         }
 
+        // Obtener las vistas de los campos de la lista
         TextView timeTextView = convertView.findViewById(R.id.timeTextView);
         TextView locationTextView = convertView.findViewById(R.id.locationTextView);
         TextView descriptionTextView = convertView.findViewById(R.id.descriptionTextView);
@@ -28,6 +47,7 @@ public class PlansAdapter extends ArrayAdapter<Plans> {
         ImageView deleteIcon = convertView.findViewById(R.id.delete_icon);
         View priorityCircleView = convertView.findViewById(R.id.priorityCircleView);
 
+        // Obtener el plan asociado con este elemento de la lista
         Plans plan = getItem(position);
         timeTextView.setText(plan.getTime());
         locationTextView.setText(plan.getLocation());
@@ -42,6 +62,10 @@ public class PlansAdapter extends ArrayAdapter<Plans> {
             priorityCircleView.setBackgroundResource(R.drawable.green_dot);
         }
 
+        /*
+         * Establecer un listener para el icono de edición. Cuando se hace clic en el icono, se muestra un cuadro de diálogo para editar el plan.
+         * El plan se actualiza con los nuevos valores y se guardan los cambios.
+         */
         editIcon.setOnClickListener(view -> {
             // Obtener el plan asociado con este icono
             Plans planToEdit = getItem(position);
@@ -98,8 +122,12 @@ public class PlansAdapter extends ArrayAdapter<Plans> {
             builder.show();
         });
 
-
+        /*
+         * Establecer un listener para el icono de eliminación. Cuando se hace clic en el icono, se muestra un cuadro de diálogo de confirmación para eliminar el plan.
+         * El plan se elimina de la lista de planes programados y se guardan los cambios.
+         */
         deleteIcon.setOnClickListener(view -> {
+            
             // Obtener el plan asociado con este icono
             Plans planToDelete = getItem(position);
 

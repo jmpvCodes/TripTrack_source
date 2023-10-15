@@ -10,26 +10,53 @@ import androidx.appcompat.app.AlertDialog;
 import java.io.File;
 import java.util.List;
 
+/**
+ * Esta clase es un adaptador que se utiliza para mostrar una lista de documentos.
+ * El adaptador se utiliza en la actividad DocumentActivity para mostrar una lista de documentos.
+ */
 public class DocumentAdapter extends ArrayAdapter<Document> {
+
+    /**
+     * Constructor de la clase DocumentAdapter.
+     *
+     * @param context   el contexto en el que se utiliza el adaptador
+     * @param documents la lista de documentos que se mostrarán
+     */
     public DocumentAdapter(Context context, List<Document> documents) {
 
         super(context, 0, documents);
 
     }
 
+    /**
+     * Método que devuelve la vista que se muestra en la posición especificada de la lista.
+     *
+     * @param position    la posición de la vista que se va a devolver
+     * @param convertView la vista que se va a convertir
+     * @param parent      el ViewGroup en el que se va a inflar la vista
+     * @return la vista que se muestra en la posición especificada de la lista
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         Document document = getItem(position);
 
+        // Comprobar si la vista se está reutilizando, de lo contrario, inflar la vista
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list, parent, false);
         }
 
+        /*
+            * Obtener las vistas que se van a actualizar
+            * En este caso, las vistas son el nombre del documento, el icono de eliminar y el icono de editar
+            * El nombre del documento se establece en el TextView documentNameTextView
+         */
         TextView documentNameTextView = convertView.findViewById(R.id.document_name_text_view);
         documentNameTextView.setText(document.getName());
         ImageView deleteIcon = convertView.findViewById(R.id.delete_icon);
         ImageView editIcon = convertView.findViewById(R.id.edit_icon);
+
+        // Establecer un clic largo en la vista para mostrar una ventana de diálogo de opciones de eliminación
         deleteIcon.setOnClickListener(v -> {
             // Mostrar una ventana de diálogo de confirmación
             new AlertDialog.Builder(getContext())
@@ -54,6 +81,8 @@ public class DocumentAdapter extends ArrayAdapter<Document> {
                     .setNegativeButton("No", null)
                     .show();
         });
+
+        // Establecer un clic largo en la vista para mostrar una ventana de diálogo para editar el nombre del archivo
         editIcon.setOnClickListener(view -> {
             // Obtener el documento correspondiente
             Document document12 = getItem(position);

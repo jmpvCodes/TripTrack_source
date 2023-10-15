@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * Fragmento que muestra la lista de carpetas de una galería de fotos.
- * Este fragmento se utiliza en la pestaña "Álbum" de la actividad principal.
+ * Este fragmento se utiliza en la pestana "Album" de la actividad principal.
  */
 public class AlbumTabFragment extends Fragment {
 
@@ -33,7 +33,9 @@ public class AlbumTabFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-
+    /**
+     * Constructor público vacío requerido por el sistema
+     */
     public AlbumTabFragment() {
         // Constructor público vacío requerido por el sistema
     }

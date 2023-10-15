@@ -23,6 +23,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Esta clase representa la actividad Mapamundi.
+ * Esta actividad muestra un mapa del mundo y permite al usuario agregar marcadores en el mapa.
+ */
 public class MapamundiActivity extends AppCompatActivity {
 
     private MapView mapView;
@@ -41,7 +45,7 @@ public class MapamundiActivity extends AppCompatActivity {
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> onBackPressed());
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+       BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(
                 (BottomNavigationView.OnNavigationItemSelectedListener) item -> {
                     // Obtener el ID del item seleccionado

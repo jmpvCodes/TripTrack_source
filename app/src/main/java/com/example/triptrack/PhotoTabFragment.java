@@ -29,9 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link PhotoTabFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Esta clase representa el fragmento de la pestaña de la foto.
  */
 public class PhotoTabFragment extends Fragment {
 
@@ -58,7 +56,9 @@ public class PhotoTabFragment extends Fragment {
 
     private LottieAnimationView lottieAnimationView;
 
-
+    /**
+     * Constructor vacio requerido para el fragmento de la pestaña de la foto.
+     */
     public PhotoTabFragment() {
         // Required empty public constructor
     }

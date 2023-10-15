@@ -7,9 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link InvoiceTabFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Esta clase representa el fragmento de la pestaña de la factura.
  */
 public class InvoiceTabFragment extends Fragment {
 
@@ -18,6 +16,10 @@ public class InvoiceTabFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+
+    /**
+     * Constructor vacio requerido para el fragmento de la pestaña de la factura.
+     */
     public InvoiceTabFragment() {
         // Required empty public constructor
     }

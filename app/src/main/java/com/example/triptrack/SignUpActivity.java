@@ -29,7 +29,15 @@ import java.util.regex.Pattern;
 
 import static android.content.ContentValues.TAG;
 
+/**
+ * Clase que maneja la actividad de registro de usuario.
+ * Permite al usuario ingresar su nombre, apellido, correo electrónico y contraseña para crear una cuenta.
+ * La clase utiliza Firebase Authentication para registrar al usuario y Firestore para almacenar su información.
+ * La clase también realiza validaciones en los campos de entrada antes de registrar al usuario.
+ */
 public class SignUpActivity extends AppCompatActivity {
+
+    // Declaración de variables
 
     TextView otherUsersText, welcomeLabel, headLabel;
     ImageView signUpImageView;
@@ -37,14 +45,19 @@ public class SignUpActivity extends AppCompatActivity {
     MaterialButton SignUpButton;
     TextInputEditText nameInputText, surnameInputText, emailEditText, passwordEditText, confirmPasswordEditText;
 
-    private FirebaseAuth mAuth;
+    private FirebaseAuth mAuth; // Instancia de FirebaseAuth
 
+    /**
+     * Método que se ejecuta cuando se crea la actividad
+     * @param savedInstanceState estado de la instancia guardada
+     */
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
+        // Inicialización de variables
         signUpImageView = findViewById(R.id.signUpImageView);
         welcomeLabel = findViewById(R.id.welcomeLabel);
         headLabel = findViewById(R.id.headLabel);
@@ -59,17 +72,26 @@ public class SignUpActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.passwordEditText);
         confirmPasswordEditText = findViewById(R.id.confirmPasswordEditText);
 
+        // Transición de elementos
         otherUsersText.setOnClickListener(v -> transitionBack());
 
+        // Registro de usuario
         SignUpButton.setOnClickListener(v -> {
             validate();
 
         });
+        // Inicialización de Firebase
         mAuth = FirebaseAuth.getInstance();
     }
 
+    /**
+     * Método para registrar al usuario en Firebase Authentication y guardar su información en Firestore
+     * @param email correo electrónico del usuario
+     * @param password contraseña del usuario
+     */
     private void register(String email, String password){
 
+        // Crea un nuevo usuario con el correo electrónico y la contraseña proporcionados
         mAuth.createUserWithEmailAndPassword(email,password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()){
@@ -99,12 +121,14 @@ public class SignUpActivity extends AppCompatActivity {
                             db.collection("users").document(user.getUid()).set(userData);
                         }
 
+                        // Inicia la actividad de inicio de sesión
                         Intent intent = new Intent (SignUpActivity.this, LoginActivity.class);
                         Toast.makeText(SignUpActivity.this, "Usuario registrado correctamente", Toast.LENGTH_LONG).show();
                         startActivity(intent);
                         finish();
                     }
 
+                    // Si falla el registro, muestra un mensaje de error
                     else{
                         Toast.makeText(SignUpActivity.this, "Fallo al registrarse", Toast.LENGTH_LONG).show();
                     }
@@ -112,12 +136,19 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
+    /**
+        * Método para validar los campos de entrada
+        * Verifica que el correo electrónico sea válido, que la contraseña tenga más de 8 caracteres y que la confirmación de la contraseña coincida con la contraseña
+        */
+
     private void validate () {
 
+        // Obtiene el texto de los campos de entrada
         String email = Objects.requireNonNull(emailEditText.getText()).toString().trim();
         String password = Objects.requireNonNull(passwordEditText.getText()).toString().trim();
         String confirmpassword = Objects.requireNonNull(confirmPasswordEditText.getText()).toString().trim();
 
+        // Valida los campos de entrada
         if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailEditText.setError("Correo inválido!");
             return;
@@ -126,7 +157,7 @@ public class SignUpActivity extends AppCompatActivity {
         else{
             emailEditText.setError(null);
         }
-
+        // Valida la contraseña
         if (password.isEmpty() || password.length() < 8){
             passwordEditText.setError("Se necesitan más de 8 caracteres");
             return;
@@ -141,6 +172,7 @@ public class SignUpActivity extends AppCompatActivity {
             passwordEditText.setError(null);
         }
 
+        // Valida la confirmación de la contraseña
         if (!confirmpassword.equals(password)){
             confirmPasswordEditText.setError("Las contraseñas no coinciden. Compruébalo de nuevo!");
         }
@@ -151,15 +183,24 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Método para volver a la actividad de inicio de sesión cuando se presiona el botón de retroceso
+     */
+
     @Override
     public void onBackPressed() {
         transitionBack();
     }
 
+    /**
+     * Método para realizar la transición de elementos a la actividad de inicio de sesión
+    */    
+
     private void transitionBack() {
 
         Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
 
+        // Transición de elementos
         Pair[] pairs = new Pair[7];
         pairs[0] = new Pair<View, String>(signUpImageView, "logoImageTrans");
         pairs[1] = new Pair<View, String>(welcomeLabel, "welcomeTrans");
@@ -173,6 +214,5 @@ public class SignUpActivity extends AppCompatActivity {
         startActivity(intent, options.toBundle());
 
     }
-
 
 }

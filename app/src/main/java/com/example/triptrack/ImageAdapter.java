@@ -17,7 +17,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Esta clase es un adaptador que se utiliza para mostrar una cuadrícula de imágenes.
+ * El adaptador se utiliza en la actividad AlbumPhotoActivity para mostrar una cuadrícula de imágenes.
+ */
 public class ImageAdapter extends BaseAdapter {
+
+    /*
+        * Declarar las variables que se utilizarán en la clase
+     */
     private Context context;
     private File[] files;
     private Set<Integer> selectedPositions = new HashSet<>();
@@ -26,6 +34,12 @@ public class ImageAdapter extends BaseAdapter {
 
     private List<String> fileNames;
 
+
+    /**
+     * Constructor de la clase ImageAdapter.
+     *
+     * @param context el contexto en el que se utiliza el adaptador
+     */
     public ImageAdapter(Context context) {
         this.context = context;
         this.imageList = new ArrayList<>();
@@ -33,42 +47,60 @@ public class ImageAdapter extends BaseAdapter {
         this.files = new File[0]; // Inicializar files como una matriz vacía
     }
 
-
+    /**
+     * Método que devuelve si el modo de selección está activado o no.
+     * @param files la lista de archivos que se mostrarán
+     */
     public void setFiles(File[] files) {
         this.files = files;
         notifyDataSetChanged();
     }
 
-    public void setSelectionMode(boolean selectionMode) {
-        this.selectionMode = selectionMode;
-        if (!selectionMode) {
-            selectedPositions.clear();
-        }
-        notifyDataSetChanged();
-    }
 
-    public Set<Integer> getSelectedPositions() {
-        return selectedPositions;
-    }
-
+    /**
+     * Devuelve la longitud de 'files', no de 'imageList'
+     * @return la longitud de 'files', no de 'imageList'
+     */
     @Override
     public int getCount() {
         return files != null ? files.length : 0; // Aquí debes devolver la longitud de 'files', no de 'imageList'
     }
 
+    /**
+     * Método que devuelve el archivo en la posición especificada de la lista.
+     *
+     * @param position la posición del archivo que se va a devolver
+     * @return el archivo en la posición especificada de la lista
+     */
     @Override
     public Object getItem(int position) {
         return files != null ? files[position] : null;
     }
 
+    /**
+     * Método que devuelve el ID del archivo en la posición especificada de la lista.
+     *
+     * @param position la posición del archivo cuyo ID se va a devolver
+     * @return el ID del archivo en la posición especificada de la lista
+     */
     @Override
     public long getItemId(int position) {
         return position;
     }
 
+    /**
+     * Método que devuelve la vista que se muestra en la posición especificada de la lista.
+     *
+     * @param position    la posición de la vista que se va a devolver
+     * @param convertView la vista que se va a convertir
+     * @param parent      el ViewGroup en el que se va a inflar la vista
+     * @return la vista que se muestra en la posición especificada de la lista
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
+
+        // Comprobar si la vista se está reutilizando, de lo contrario, inflar la vista
         if (convertView == null) {
             imageView = new ImageView(context);
             imageView.setLayoutParams(new GridView.LayoutParams(250, 250)); // Aumentar el ancho y el alto para hacer que las imágenes se vean más grandes
@@ -90,6 +122,11 @@ public class ImageAdapter extends BaseAdapter {
             imageView.setBackgroundColor(Color.TRANSPARENT);
         }
 
+        /*
+            * Obtener el archivo en la posición especificada de la lista
+            * Mostrar un video si el archivo es un video
+            * Mostrar una imagen si el archivo es una imagen
+         */
         File file = files[position];
         if (file.getName().endsWith(".mp4")) {
             // Mostrar un video
@@ -113,6 +150,11 @@ public class ImageAdapter extends BaseAdapter {
         return imageView;
     }
 
+    /**
+     * add a new image to the list
+     * @param image imagen a añadir
+     * @param fileName nombre del archivo
+     */
     public void add(Bitmap image, String fileName) {
         imageList.add(image);
         fileNames.add(fileName);

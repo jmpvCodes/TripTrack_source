@@ -24,6 +24,11 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Esta actividad muestra una lista de viajes finalizados.
+ * La actividad tiene una barra de herramientas en la parte superior y una barra de navegación en la parte inferior.
+ * En el medio, hay un contenedor que muestra un CardView para cada viaje.
+ */
 public class FinishedTripsActivity extends AppCompatActivity {
 
     @Override
@@ -31,12 +36,14 @@ public class FinishedTripsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_finished_trips);
 
+        // Configurar la barra de herramientas
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
+        // Configurar el botón de retroceso
         ImageButton backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> onBackPressed());
+        backButton.setOnClickListener(v -> onBackPressed());;
 
         CardView warningCard = findViewById(R.id.warning_no_trips);
         warningCard.setVisibility(View.GONE);
