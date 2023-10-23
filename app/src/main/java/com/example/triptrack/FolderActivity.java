@@ -37,11 +37,11 @@ public class FolderActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_PICK = 2;
 
+    private View rootView;
+
     private LottieAnimationView lottieAnimationView;
 
     private TextView messageTextView, messageTextView2;
-
-    private View rootView;
 
     private FloatingActionButton createFolderButton;
 
@@ -80,6 +80,8 @@ public class FolderActivity extends AppCompatActivity {
         messageTextView2 = findViewById(R.id.messageTextView2);
 
         createFolderButton = findViewById(R.id.createFolderButton);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+
 
 
         // Obtener una referencia al GridView
@@ -106,6 +108,7 @@ public class FolderActivity extends AppCompatActivity {
                     messageTextView.setVisibility(View.GONE);
                     messageTextView2.setVisibility(View.GONE);
                     createFolderButton.setVisibility(View.VISIBLE);
+                    gridView.setVisibility(View.VISIBLE);
                     adapter.setFiles(files);
             } else {
                 // No hay imágenes o videos en el directorio
@@ -113,6 +116,8 @@ public class FolderActivity extends AppCompatActivity {
                 messageTextView.setVisibility(View.VISIBLE);
                 messageTextView2.setVisibility(View.VISIBLE);
                 createFolderButton.setVisibility(View.GONE);
+                gridView.setVisibility(View.GONE);
+
                 Toast.makeText(this, "No se encontraron imágenes o videos en la carpeta", Toast.LENGTH_LONG).show();
             }
         } else {
@@ -235,7 +240,6 @@ public class FolderActivity extends AppCompatActivity {
             }
         });
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(
                 (BottomNavigationView.OnNavigationItemSelectedListener) item -> {
                     // Obtener el ID del item seleccionado
@@ -311,8 +315,10 @@ public class FolderActivity extends AppCompatActivity {
 
             // Ocultar el LottieAnimationView y el TextView
             gridView.setVisibility(View.VISIBLE);
+
             LottieAnimationView lottieAnimationView = findViewById(R.id.lottieAnimationView);
             lottieAnimationView.setVisibility(View.GONE);
+
             TextView messageTextView = findViewById(R.id.messageTextView);
             TextView messageTextView2 = findViewById(R.id.messageTextView2);
             messageTextView.setVisibility(View.GONE);
@@ -337,25 +343,10 @@ public class FolderActivity extends AppCompatActivity {
                     cursor.close();
                 }
 
-                // Mostrar la imagen en el GridView
-                adapter.add(imageBitmap, fileName);
-                adapter.notifyDataSetChanged();
-
-                // Ocultar el LottieAnimationView y el TextView
-                LottieAnimationView lottieAnimationView = findViewById(R.id.lottieAnimationView);
-                lottieAnimationView.setVisibility(View.GONE);
-                TextView messageTextView = findViewById(R.id.messageTextView);
-                TextView messageTextView2 = findViewById(R.id.messageTextView2);
-                messageTextView.setVisibility(View.GONE);
-                messageTextView2.setVisibility(View.GONE);
-
-
-                createFolderButton.setVisibility(View.VISIBLE);
-
+                // Guardar la imagen en el almacenamiento interno de la aplicación
                 String tripId = getIntent().getStringExtra("tripId");
-                String folderName = getIntent().getStringExtra("folderName"); // Guardar la imagen en el almacenamiento interno de la aplicación
+                String folderName = getIntent().getStringExtra("folderName");
                 File directory = new File(FolderActivity.this.getFilesDir(), "Galería/" + tripId + "/" + folderName);
-
                 if (!directory.exists()) {
                     directory.mkdirs();
                 }
@@ -371,13 +362,42 @@ public class FolderActivity extends AppCompatActivity {
                     outputStream.close();
                     inputStream.close();
 
+                    // Leer los archivos de la carpeta especificada
+                    File[] files = directory.listFiles(file2 -> {
+                        // Filtrar solo los archivos de imagen o video
+                        String fileName2 = file2.getName().toLowerCase();
+                        return fileName2.endsWith(".jpg") || fileName2.endsWith(".jpeg") || fileName2.endsWith(".png") || fileName2.endsWith(".mp4");
+                    });
+
+                    // Pasar la lista de archivos al adaptador del GridView
+                    adapter.setFiles(files);
+
+                    // Notificar al adaptador que los datos han cambiado
+                    adapter.notifyDataSetChanged();
+
+                    // Ocultar el LottieAnimationView y el TextView
+                    gridView.setVisibility(View.VISIBLE);
+
+                    LottieAnimationView lottieAnimationView = findViewById(R.id.lottieAnimationView);
+                    lottieAnimationView.setVisibility(View.GONE);
+
+                    TextView messageTextView = findViewById(R.id.messageTextView);
+                    TextView messageTextView2 = findViewById(R.id.messageTextView2);
+                    messageTextView.setVisibility(View.GONE);
+                    messageTextView2.setVisibility(View.GONE);
+
+                    createFolderButton.setVisibility(View.VISIBLE);
+
                 } catch (IOException e) {
                     // Manejar excepción
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
+
     }
 
-}
+    }

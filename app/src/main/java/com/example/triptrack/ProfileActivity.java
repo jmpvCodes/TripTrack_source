@@ -23,6 +23,8 @@ import java.util.Objects;
  */
 public class ProfileActivity extends AppCompatActivity {
 
+    private BottomNavigationView bottomNavigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,14 +38,15 @@ public class ProfileActivity extends AppCompatActivity {
         // Configurar el botón de retroceso
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> onBackPressed()); //Generación de Toolbar
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.bottom_nav_profile);
         bottomNavigationView.setOnItemSelectedListener(
                 (BottomNavigationView.OnNavigationItemSelectedListener) item -> {
                     // Obtener el ID del item seleccionado
                     int itemId = item.getItemId();
 
                     // Realizar acciones basadas en el item seleccionado
-                    if (itemId == R.id.nav_my_trips) {
+                    if (itemId == R.id.bottom_nav_my_trips) {
                         // Acción para la pestaña "Buscar"
                         // Ejemplo: iniciar la actividad correspondiente
                         Intent mainIntent = new Intent(this, MainActivity.class);
@@ -153,6 +156,17 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 });
 
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        Intent mainIntent = new Intent(this, MainActivity.class);
+        startActivity(mainIntent);
+
+        // Configurar el ítem seleccionado en BottomNavigationView
+        // Cambia esto al ID del ítem correspondiente a la actividad a la que estás volviendo
+        bottomNavigationView.setSelectedItemId(R.id.bottom_nav_my_trips);
     }
 
 

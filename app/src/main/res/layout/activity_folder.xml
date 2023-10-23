@@ -5,10 +5,14 @@
 										   android:layout_width="match_parent"
 										   android:layout_height="match_parent">
 
-	<LinearLayout
+	<RelativeLayout
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:orientation="vertical">
+			>
+
+		<LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
+
+
 
 		<!-- AppBar -->
 		<androidx.appcompat.widget.Toolbar
@@ -22,14 +26,14 @@
 
 			<ImageButton
 					android:id="@+id/back_button"
-					android:layout_width="45dp"
-					android:layout_height="45dp"
+					android:layout_width="48dp"
+					android:layout_height="48dp"
 					android:layout_marginStart="8dp"
 					android:layout_marginEnd="8dp"
 					android:backgroundTint="@color/white"
 					android:src="@drawable/ic_arrow_back"
 					android:contentDescription="BACK BUTTON"
-					android:scaleType="fitStart" />
+					android:scaleType="fitStart"/>
 
 			<!-- Title -->
 			<TextView
@@ -56,6 +60,8 @@
 
 		</androidx.appcompat.widget.Toolbar>
 
+
+
 		<com.airbnb.lottie.LottieAnimationView
 				android:id="@+id/lottieAnimationView"
 				android:layout_width="250dp"
@@ -63,6 +69,8 @@
 				android:layout_marginTop="50dp"
 				android:layout_gravity="center_horizontal"
 				app:lottie_rawRes="@raw/import_photo" />
+
+
 
 		<TextView
 				android:id="@+id/messageTextView"
@@ -84,28 +92,31 @@
 				android:text="¡Comienza desde hoy a inmortalizar los momentos de tu viaje!"
 		/>
 
-		<GridView
-				android:id="@+id/gridView"
-				android:numColumns="auto_fit"
-				android:gravity="center"
-				android:layout_marginTop="25dp"
-				android:layout_width="match_parent"
-				android:layout_height="450dp"
-				android:columnWidth="100dp"
-				android:horizontalSpacing="10dp"
-				android:verticalSpacing="10dp" />
+			<GridView
+					android:id="@+id/gridView"
+					android:numColumns="auto_fit"
+					android:gravity="center"
+					android:layout_marginTop="25dp"
+					android:layout_width="match_parent"
+					android:layout_height="450dp"
+					android:columnWidth="100dp"
+					android:horizontalSpacing="10dp"
+					android:verticalSpacing="10dp"
+			/>
 
-		<com.google.android.material.floatingactionbutton.FloatingActionButton
-				android:id="@+id/createFolderButton"
-				android:layout_width="55dp"
-				android:layout_marginTop="20dp"
-				android:layout_marginBottom="20dp"
-				android:layout_marginRight="40dp"
-				android:layout_height="55dp"
-				android:src="@drawable/ic_add"
-				android:layout_gravity="right"
-				android:scaleType="center"
-				app:backgroundTint="@color/colorAccent" />
+			<com.google.android.material.floatingactionbutton.FloatingActionButton
+					android:id="@+id/createFolderButton"
+					android:layout_width="55dp"
+					android:layout_marginTop="20dp"
+					android:layout_marginBottom="20dp"
+					android:layout_marginRight="40dp"
+					android:layout_height="55dp"
+					android:src="@drawable/ic_add"
+					android:layout_gravity="right"
+					android:scaleType="center"
+					app:backgroundTint="@color/colorAccent" />
+
+		</LinearLayout>
 
 		<!-- Bottom Navigation Bar -->
 		<com.google.android.material.bottomnavigation.BottomNavigationView
@@ -113,10 +124,14 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_gravity="bottom"
+				android:layout_alignParentBottom="true"
 				android:background="?android:attr/windowBackground"
 				app:menu="@menu/bottom_nav"/>
 
-	</LinearLayout>
+
+
+	</RelativeLayout>
+
 
 
 </androidx.drawerlayout.widget.DrawerLayout>

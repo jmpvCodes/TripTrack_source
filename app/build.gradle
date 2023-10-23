@@ -43,7 +43,9 @@ dependencies {
     //noinspection GradleCompatible
     implementation "com.android.support:support-core-utils:28.0.0"
     implementation 'com.google.firebase:firebase-firestore:24.7.0'
+    implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'org.osmdroid:osmdroid-android:6.1.16'
     implementation 'android.arch.navigation:navigation-fragment:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -57,6 +59,10 @@ dependencies {
     implementation 'io.github.minyushov:tooltips:2.1.0'
     implementation 'com.github.vihtarb:tooltip:0.2.0'
     implementation files('C:\\Users\\jmpv\\AppData\\Local\\Android\\Sdk\\platforms\\android-33\\android.jar ')
+    implementation 'androidx.core:core:1.7.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.android.volley:volley:1.2.1'
+    implementation 'com.google.firebase:firebase-database:20.3.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
     implementation 'com.android.support.constraint:constraint-layout:2.0.4'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'

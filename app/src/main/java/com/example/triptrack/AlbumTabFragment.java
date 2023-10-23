@@ -225,6 +225,12 @@ public class AlbumTabFragment extends Fragment {
                 // Acciones a realizar cuando se hace clic en "Aceptar"
                 String folderName = input.getText().toString();
 
+                // Comprobar si folderName es una cadena de texto y no solo un número
+                if (!folderName.matches(".*[a-zA-Z].*")) {
+                    Toast.makeText(getActivity(), "Por favor, introduce un nombre válido para la carpeta.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 // Crear una nueva carpeta
                 File directory1 = new File(getActivity().getFilesDir(), "Galería/" + tripId + "/" + folderName);
                 if (!directory1.exists()) {
@@ -245,6 +251,7 @@ public class AlbumTabFragment extends Fragment {
 
             builder.show();
         });
+
 
     }
 

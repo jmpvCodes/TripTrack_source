@@ -103,13 +103,19 @@ public class PlansAdapter extends ArrayAdapter<Plans> {
                 int hour = timePicker.getHour();
                 int minute = timePicker.getMinute();
                 String time = String.format("%02d:%02d", hour, minute);
-                String location = locationEditText.getText().toString();
+
+                String locationText = locationEditText.getText().toString();
+                if (!locationText.matches("[a-zA-Z ]+")) {
+                    Toast.makeText(this.getContext(), "Por favor, introduce una ubicación válida.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 String description = descriptionEditText.getText().toString();
                 int priority = prioritySpinner.getSelectedItemPosition() + 1;
 
                 // Actualizar el plan con los nuevos valores
                 planToEdit.setTime(time);
-                planToEdit.setLocation(location);
+                planToEdit.setLocation(locationText); // Aquí está la corrección
                 planToEdit.setDescription(description);
                 planToEdit.setPriority(priority);
 
@@ -118,9 +124,10 @@ public class PlansAdapter extends ArrayAdapter<Plans> {
                 activity.updateScheduledPlansList();
             });
 
-            // Mostrar el cuadro de diálogo
+// Mostrar el cuadro de diálogo
             builder.show();
         });
+
 
         /*
          * Establecer un listener para el icono de eliminación. Cuando se hace clic en el icono, se muestra un cuadro de diálogo de confirmación para eliminar el plan.

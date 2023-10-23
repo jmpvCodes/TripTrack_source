@@ -156,14 +156,18 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
+        String tripId = getIntent().getStringExtra("tripId");
+
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.nav_my_trips);
         bottomNavigationView.setOnItemSelectedListener(
                 (BottomNavigationView.OnNavigationItemSelectedListener) item -> {
                     // Obtener el ID del item seleccionado
                     int itemId = item.getItemId();
 
                     // Realizar acciones basadas en el item seleccionado
-                    if (itemId == R.id.nav_my_trips) {
+                    if (itemId == R.id.bottom_nav_my_trips) {
                         // Acción para la pestaña "Buscar"
                         // Ejemplo: iniciar la actividad correspondiente
                         Intent mainIntent = new Intent(this, MainActivity.class);
@@ -173,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
                         // Acción para la pestaña "Buscar"
                         // Ejemplo: iniciar la actividad correspondiente
                         Intent searchIntent = new Intent(this, MapamundiActivity.class);
+                        searchIntent.putExtra("tripId",tripId);
                         startActivity(searchIntent);
                         return true;
                     } else if (itemId == R.id.bottom_nav_profile) {
@@ -204,7 +209,6 @@ public class MainActivity extends AppCompatActivity {
         String returnDate = getIntent().getStringExtra("returnDate");
         String peopleCount = getIntent().getStringExtra("peopleCount");
         String price = getIntent().getStringExtra("price");
-        String tripId = getIntent().getStringExtra("tripId");
 
 
         // Agregar el CardView con los datos del viaje

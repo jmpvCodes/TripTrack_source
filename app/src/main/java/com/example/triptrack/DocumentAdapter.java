@@ -101,7 +101,7 @@ public class DocumentAdapter extends ArrayAdapter<Document> {
                     .setView(input)
                     .setPositiveButton("Guardar", (dialog, which) -> {
                         // Obtener el nuevo nombre del archivo
-                        String newName = input.getText().toString();
+                        String newName = input.getText().toString() + ".jpg";
                         // Renombrar el archivo en el almacenamiento interno
                         File oldFile = new File(document12.getPath());
                         File newFile = new File(oldFile.getParent(), newName);

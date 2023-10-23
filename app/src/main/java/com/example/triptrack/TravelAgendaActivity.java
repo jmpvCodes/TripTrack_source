@@ -97,7 +97,7 @@ public class TravelAgendaActivity extends AppCompatActivity {
             // Crear un AlertDialog para preguntar al usuario si está seguro de borrar todos los planes
             new AlertDialog.Builder(this)
                     .setTitle("Borrar todos los planes")
-                    .setMessage("¿Estás seguro de que quieres borrar todos los planes del día seleccionado?")
+                    .setMessage("¿Estás seguro de que quieres borrar todos los planes apuntados?")
                     .setPositiveButton("Sí", (dialog, which) -> {
                         // Borrar todos los planes
                         cleanAllPlans();
@@ -147,6 +147,12 @@ public class TravelAgendaActivity extends AppCompatActivity {
                 Toast.makeText(this, "Por favor selecciona una prioridad", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            String locationText = locationEditText.getText().toString();
+            if (!locationText.matches(".*[a-zA-Z].*")) {
+                Toast.makeText(this, "Por favor, introduce una ubicación válida.", Toast.LENGTH_SHORT).show();
+                return;
+            }
             int hour = timePicker.getCurrentHour();
             int minute = timePicker.getCurrentMinute();
             String time = String.format("%02d:%02d", hour, minute);
@@ -174,6 +180,11 @@ public class TravelAgendaActivity extends AppCompatActivity {
 
             // Obtener la fecha seleccionada usando el método getSelectedDate()
             CalendarDay selectedDate = calendarView.getSelectedDate();
+            if (selectedDate == null) {
+                Toast.makeText(this, "Por favor, selecciona una fecha.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             // Crear un objeto Calendar a partir de la fecha seleccionada
             Calendar calendar = selectedDate.getCalendar();
             // Obtener el tiempo en milisegundos de la fecha seleccionada

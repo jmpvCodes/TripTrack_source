@@ -141,15 +141,37 @@ public class BudgetTabFragment extends Fragment {
 
         // Configurar el evento click del botón "Añadir presupuesto"
         budget_button.setOnClickListener(v -> {
-            budget_button.setVisibility(View.GONE);
-            budgetEditText.setVisibility(View.GONE);
-            budgetDisplay.setText(getString(R.string.budget_text, budgetEditText.getText().toString()));
-            budgetDisplay.setVisibility(View.VISIBLE);
-            expenseAmountEditText.setVisibility(View.VISIBLE);
-            expenseConceptEditText.setVisibility(View.VISIBLE);
-            addExpenseButton.setVisibility(View.VISIBLE);
 
-            setBudget();
+            // Comprobar si el campo budget_edittext está vacío
+            if (budgetEditText.getText().toString().trim().isEmpty()) {
+                budget_button.setVisibility(View.VISIBLE);
+                budgetEditText.setVisibility(View.VISIBLE);
+                expenseAmountEditText.setVisibility(View.GONE);
+                expenseConceptEditText.setVisibility(View.GONE);
+                addExpenseButton.setVisibility(View.GONE);
+                Toast.makeText(getContext(), "Por favor, introduce un presupuesto.", Toast.LENGTH_SHORT).show();
+            }
+
+            // Comprobar si amountText es un número
+            else if (budgetEditText.getText().toString().matches("[a-zA-Z]+")) {
+                budget_button.setVisibility(View.VISIBLE);
+                budgetEditText.setVisibility(View.VISIBLE);
+                expenseAmountEditText.setVisibility(View.GONE);
+                expenseConceptEditText.setVisibility(View.GONE);
+                addExpenseButton.setVisibility(View.GONE);
+
+                Toast.makeText(getContext(), "Por favor, introduce un número válido para la cantidad.", Toast.LENGTH_SHORT).show();
+            }
+
+            else {
+                budget_button.setVisibility(View.GONE);
+                budgetEditText.setVisibility(View.GONE);
+                expenseAmountEditText.setVisibility(View.VISIBLE);
+                expenseConceptEditText.setVisibility(View.VISIBLE);
+                addExpenseButton.setVisibility(View.VISIBLE);
+                setBudget();
+            }
+
         });
 
         // Configurar el evento click del botón "Añadir gasto"
@@ -157,11 +179,15 @@ public class BudgetTabFragment extends Fragment {
 
         return rootView;
     }
+
     private void setBudget() {
 
         String budgetText = budgetEditText.getText().toString();
+
+
         assert getArguments() != null;
         String tripId = getArguments().getString("tripId");
+
 
         if (!budgetText.isEmpty()) {
             budget = Double.parseDouble(budgetText);
@@ -194,6 +220,29 @@ public class BudgetTabFragment extends Fragment {
     private void addExpense() {
         String amountText = expenseAmountEditText.getText().toString();
         String conceptText = expenseConceptEditText.getText().toString();
+
+        // Comprobar si los campos están vacíos
+        if (amountText.isEmpty()) {
+            Toast.makeText(getContext(), "Por favor, introduce una cantidad.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (conceptText.isEmpty()) {
+            Toast.makeText(getContext(), "Por favor, introduce un concepto.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Comprobar si amountText es un número
+        if (!amountText.matches("\\d+(\\.\\d+)?")) {
+            Toast.makeText(getContext(), "Por favor, introduce un número válido para la cantidad.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Comprobar si conceptText es una cadena
+        if (conceptText.matches("\\d+")) {
+            Toast.makeText(getContext(), "Por favor, introduce un conepto válido.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (!amountText.isEmpty() && !conceptText.isEmpty()) {
 
@@ -250,6 +299,7 @@ public class BudgetTabFragment extends Fragment {
             e.printStackTrace();
         }
     }
+
     // Clase para representar un gasto
     private static class Expense {
         double amount;
