@@ -44,7 +44,7 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
     private ListView expensesListView;
     private ExpenseAdapter expenseAdapter;
     private Expense expense;
-    private Context context;
+    private Context context = this.getContext();
     private File directory, tripDirectory, file, expensesFile;
     private double budget = 0.0; // Presupuesto inicial
     private ImageView reset_icon;
@@ -185,7 +185,7 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
             assert context != null;
             Tooltip tooltip = new Tooltip.Builder(budgetEditText)
                     .setText("Establezca aquí el presupuesto que espera gastar durante el viaje")
-                    .setBackgroundColor(ContextCompat.getColor(context, R.color.verde_claro))
+                    .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.verde_claro))
                     .setTextColor(ContextCompat.getColor(context, R.color.white))
 
                     .setGravity(Gravity.BOTTOM)
@@ -286,9 +286,8 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
         } else {
             Tooltip tooltip = new Tooltip.Builder(budgetEditText)
                     .setText("Establezca aquí el presupuesto que espera gastar durante el viaje")
-                    .setBackgroundColor(ContextCompat.getColor(context, R.color.verde_claro))
-                    .setTextColor(ContextCompat.getColor(context, R.color.white))
-
+                    .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.verde_claro))
+                    .setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
                     .setGravity(Gravity.BOTTOM)
                     .setCornerRadius(8f)
                     .setDismissOnClick(true)

@@ -28,6 +28,8 @@ public class ExpenseAdapter extends ArrayAdapter<Expense> {
     private final File filesDir, tripDirectory;
     private final List<Expense> expenses;
 
+
+
     public ExpenseAdapter(Context context, List<Expense> expenses, String tripId) {
         super(context, 0);
         this.filesDir = context.getFilesDir();

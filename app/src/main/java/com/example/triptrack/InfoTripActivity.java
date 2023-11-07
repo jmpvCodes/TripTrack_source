@@ -1,11 +1,7 @@
 package com.example.triptrack;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +9,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.io.FileNotFoundException;
 import java.util.Objects;
 
 /**
@@ -24,7 +19,7 @@ import java.util.Objects;
 
 public class InfoTripActivity extends AppCompatActivity {
 
-    private static final int PICK_IMAGE_REQUEST = 1; // Código de solicitud para la selección de imágenes
+    // Código de solicitud para la selección de imágenes
 
     /**
      * Método que se llama cuando se crea la actividad.
@@ -42,7 +37,7 @@ public class InfoTripActivity extends AppCompatActivity {
 
         // Configurar el botón de retroceso
         ImageButton backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> onBackPressed());;
+        backButton.setOnClickListener(v -> onBackPressed());
 
         // Obtener los datos del intent
         Intent intent = getIntent();
@@ -72,14 +67,6 @@ public class InfoTripActivity extends AppCompatActivity {
 
         TextView priceText = findViewById(R.id.price_text);
         priceText.setText(price + " €");
-
-        // En el método onClick del botón import_photo_button
-        ImageButton importPhotoButton = findViewById(R.id.import_photo_button);
-        importPhotoButton.setOnClickListener(v -> {
-            Intent intent15 = new Intent(Intent.ACTION_PICK);
-            intent15.setType("image/*");
-            startActivityForResult(intent15, PICK_IMAGE_REQUEST);
-        });
 
         // Funcionalidad de importar documentos
         CardView importDocumentsCard = findViewById(R.id.import_documents);
@@ -146,40 +133,6 @@ public class InfoTripActivity extends AppCompatActivity {
                     return false;
                 }); // Generar la barra de navegación inferior
 
-    }
-
-    /**
-     * Método que se llama cuando se recibe un resultado la actividad.
-     * Se utiliza para obtener la imagen seleccionada por el usuario y establecerla como fondo del CardView.
-     * @param requestCode código de solicitud
-     * @param resultCode código de resultado
-     * @param data datos
-     * @see <a href="https://developer.android.com/training/basics/intents/result">Cómo obtener un resultado de una actividad</a>
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // Comprueba si el código de solicitud es el mismo que el código de solicitud de la selección de imágenes
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-
-            Uri selectedImageUri = data.getData();
-
-            // Carga la imagen seleccionada como fondo del CardView
-            CardView cardView = findViewById(R.id.card_view);
-
-            // Cambia el fondo del CardView a la imagen seleccionada
-            try {
-                cardView.setBackground(Drawable.createFromStream(getContentResolver().openInputStream(selectedImageUri), selectedImageUri.toString()));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-
-            // Cambia el color de fondo de la vista View a #80000000
-            View view = findViewById(R.id.view);
-            view.setBackgroundColor(Color.parseColor("#80000000")); 
-
-        }
     }
 
 }
