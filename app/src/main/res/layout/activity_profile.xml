@@ -27,17 +27,30 @@
 					android:layout_marginEnd="8dp"
 					android:backgroundTint="@color/white"
 					android:src="@drawable/ic_arrow_back"
-					android:contentDescription="BACK BUTTON"
 					android:scaleType="fitStart"/>
+
+			<!-- Title -->
+			<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:id="@+id/textView"
+					android:gravity="left"
+					android:text="PERFIL"
+					android:textSize="16sp"
+					android:textColor="@color/colorPrimary"
+					android:textStyle="bold"
+					android:layout_marginTop="16dp"
+					android:layout_marginBottom="16dp" />
 
 
 			<!-- Logo -->
 			<ImageView
-					android:layout_width="wrap_content"
+					android:layout_width="130dp"
+					android:layout_gravity="right"
 					android:layout_height="wrap_content"
 					android:src="@drawable/triptrack_small"
 					android:scaleType="fitStart"
-					android:padding="8dp"
+					android:padding="14dp" />
 			/>
 
 
@@ -47,6 +60,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="570dp"
 				android:orientation="vertical"
+
 				android:padding="16dp">
 
 			<LinearLayout
@@ -120,10 +134,8 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:orientation="horizontal"
-					android:layout_gravity="center"
 					android:padding="16dp">
 
-				<!-- Aquí es donde se mostraría el nombre del usuario -->
 				<TextView
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
@@ -136,7 +148,32 @@
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:textSize="25dp"
+						android:layout_marginRight="10dp"
 						android:text=" " />
+
+				<TextView
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textStyle="bold"
+						android:textSize="25dp"
+						android:text="EXP: " />
+
+				<TextView
+						android:id="@+id/user_exp"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="25dp"
+						android:text=" " />
+
+				<ImageButton
+						android:id="@+id/level_icon"
+						android:layout_width="75dp"
+						android:layout_height="50dp"
+						android:layout_marginStart="60dp"
+						android:backgroundTint="@color/white"
+						android:src="@drawable/level_icon"
+						android:scaleType="centerCrop"/>
+
 			</LinearLayout>
 
 			<TextView
@@ -144,13 +181,14 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:layout_margin="15dp"
+					android:layout_gravity="center"
 					android:text=" " />
 
 				<!-- Aquí es donde se mostraría la animación correspondiente al nivel del usuario -->
 				<com.airbnb.lottie.LottieAnimationView
 						android:id="@+id/level_animation"
-						android:layout_width="250dp"
-						android:layout_height="250dp"
+						android:layout_width="200dp"
+						android:layout_height="200dp"
 						android:layout_gravity="center"
 						app:lottie_autoPlay="true" />
 

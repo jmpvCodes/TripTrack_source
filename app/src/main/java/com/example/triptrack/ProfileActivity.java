@@ -3,18 +3,30 @@ package com.example.triptrack;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.tooltip.Tooltip;
+import org.w3c.dom.Text;
 
 import java.util.Objects;
+
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 /**
  * Esta clase representa la actividad Perfil.
@@ -84,78 +96,84 @@ public class ProfileActivity extends AppCompatActivity {
         TextView userEmail = findViewById(R.id.user_email);
         userEmail.setText(email);
 
-        TextView userLevel = findViewById(R.id.user_level);
+        TextView expText = findViewById(R.id.user_exp);
 
+        TextView levelText = findViewById(R.id.user_level);
         TextView congratulationsMessage = findViewById(R.id.congratText);
-
-        int completedTrips = 10; // Reemplaza esto con el número de viajes completados
-
-        int remainingTrips = 5; // Reemplaza esto con el número de viajes restantes para subir de nivel
-
-// Aquí es donde determinarías el nivel del usuario y cargarías la animación correspondiente
         LottieAnimationView levelAnimation = findViewById(R.id.level_animation);
-        String level = "2"; // Reemplaza esto con el nivel del usuario
-        userLevel.setText("2");
 
-        switch (level) {
-            case "1":
-                levelAnimation.setAnimation(R.raw.level1);
-                levelAnimation.setRepeatCount(LottieDrawable.INFINITE);
-                congratulationsMessage.setText("Enhorabuena. Aún eres un viajero novato has realizado " + completedTrips + " viajes, completa " + remainingTrips + " más para subir de nivel!");
-                break;
-            case "2":
-                levelAnimation.setAnimation(R.raw.level2);
-                levelAnimation.setRepeatCount(LottieDrawable.INFINITE);
-                congratulationsMessage.setText("Enhorabuena. Aún eres un viajero principiante has realizado " + completedTrips + " viajes, completa " + remainingTrips + " más para subir de nivel!");
+        ImageButton level_icon = findViewById(R.id.level_icon);
 
-                break;
-                default:
-                // Código para ejecutar si no se encuentra ningún caso
-                break;
+        level_icon.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);
+            builder.setTitle("Tabla de niveles del viajero");
+
+            ImageView image = new ImageView(ProfileActivity.this);
+            image.setImageResource(R.drawable.levels_table);
+
+            builder.setView(image);
+
+            builder.setPositiveButton("Cerrar", null);
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        });
+
+
+        SharedPreferences prefs = getSharedPreferences("ViajesFinalizados", Context.MODE_PRIVATE);
+        int finishedTrips = prefs.getInt("viajes_finalizados", 0);
+        int expTotal = prefs.getInt("exp", 0);
+
+        Log.d(TAG, "viajes finalizados: " + finishedTrips);
+        Log.d(TAG, "expTotal: " + expTotal);
+
+        expText.setText(String.valueOf(expTotal));
+
+
+        if (finishedTrips == 0) {
+            levelText.setText("0");
+            levelAnimation.setAnimation(R.raw.level0);
+            levelAnimation.setRepeatCount(LottieDrawable.INFINITE);
+            congratulationsMessage.setText("Oh! Aún no has registrado ningun viaje! Anímate y empieza el primero! Completa " + (1  - finishedTrips) + " viaje para subir de nivel");
+            Tooltip tooltip = new Tooltip.Builder(level_icon)
+                    .setText("Pulse aquí para ver la tabla de niveles del viajero")
+                    .setBackgroundColor(ContextCompat.getColor(this, R.color.verde_claro))
+                    .setTextColor(ContextCompat.getColor(this, R.color.white))
+
+                    .setGravity(Gravity.BOTTOM)
+                    .setCornerRadius(8f)
+                    .setDismissOnClick(true)
+                    .show();
+            // Programar la eliminación del mensaje después de 5 segundos
+            new Handler(Looper.getMainLooper()).postDelayed(tooltip::dismiss, 4000);
+        }
+        else if (finishedTrips < 4) {
+            levelText.setText("1");
+            levelAnimation.setAnimation(R.raw.level1);
+            levelAnimation.setRepeatCount(LottieDrawable.INFINITE);
+            congratulationsMessage.setText("Enhorabuena. Eres un viajero EXPLORADOR! Has realizado " + finishedTrips + " viajes!. Completa " + (4 - finishedTrips) + " viajes más para subir de nivel");
+        }
+        else if (finishedTrips == 4 || finishedTrips > 4 && finishedTrips < 6) {
+            levelText.setText("2");
+            levelAnimation.setAnimation(R.raw.level2);
+            levelAnimation.setRepeatCount(LottieDrawable.INFINITE);
+            congratulationsMessage.setText("Enhorabuena. Eres un viajero AVENTURERO! Has realizado " + finishedTrips + " viajes!. Completa " + (6 - finishedTrips) + " viajes más para subir de nivel");
+        }
+        else if (finishedTrips >= 6 && finishedTrips < 8) {
+            levelText.setText("3");
+            levelAnimation.setAnimation(R.raw.level3);
+            levelAnimation.setRepeatCount(LottieDrawable.INFINITE);
+            congratulationsMessage.setText("Enhorabuena. Eres un viajero CONQUISTADOR! Has realizado " + finishedTrips + " viajes!. Completa " + (8 - finishedTrips) + " viajes más para subir de nivel");
+        }
+        else {
+            levelText.setText("4");
+            levelAnimation.setAnimation(R.raw.level4);
+            levelAnimation.setRepeatCount(LottieDrawable.INFINITE);
+            congratulationsMessage.setText("Enhorabuena. Eres un MAESTRO DE RUTAS! Has realizado " + finishedTrips + " viajes!. Sigue así!");
         }
 
+
         levelAnimation.playAnimation();
-
-    }
-
-    private void generacionToolbar(){
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ImageButton backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> onBackPressed());
-
-    }
-
-    private void generacionBottomNavigationBar(){
-
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(
-                new BottomNavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        // Obtener el ID del item seleccionado
-                        int itemId = item.getItemId();
-
-                        // Realizar acciones basadas en el item seleccionado
-                        switch (itemId) {
-                            case R.id.bottom_nav_my_trips:
-                                // Acción para la pestaña "Inicio"
-                                // Ejemplo: iniciar la actividad correspondiente
-                                Intent homeIntent = new Intent(ProfileActivity.this, MainActivity.class);
-                                startActivity(homeIntent);
-                                return true;
-                            case R.id.bottom_nav_world:
-                                // Acción para la pestaña "Buscar"
-                                // Ejemplo: iniciar la actividad correspondiente
-                                Intent searchIntent = new Intent(ProfileActivity.this, MapamundiActivity.class);
-                                startActivity(searchIntent);
-                                return true;
-                        }
-
-                        return false;
-                    }
-                });
-
     }
 
     @Override

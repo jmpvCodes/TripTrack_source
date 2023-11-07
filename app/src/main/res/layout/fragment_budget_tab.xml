@@ -20,8 +20,12 @@
 			android:layout_margin="16dp"
 			android:hint="Presupuesto" />
 
+		<LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="30dp" android:orientation="horizontal" android:layout_gravity="center">
+
+
 	<!-- Budget Display -->
 	<TextView
+
 			android:id="@+id/budget_display"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
@@ -31,7 +35,19 @@
 			android:layout_marginTop="20dp"
 			android:layout_marginBottom="16dp" />
 
-	<!-- Add Expense Button -->
+			<ImageButton
+					android:id="@+id/reset_icon"
+					android:layout_width="50dp"
+					android:layout_height="50dp"
+					android:layout_marginStart="60dp"
+					android:backgroundTint="@color/white"
+					android:src="@drawable/reset_icon"
+					android:scaleType="centerCrop"/>
+
+		</LinearLayout>
+
+
+		<!-- Add Expense Button -->
 	<Button
 			android:id="@+id/budget_button"
 			android:layout_width="match_parent"

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,35 +12,55 @@ import android.view.ViewGroup;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.tooltip.Tooltip;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 /**
  * Esta clase es un fragmento que se utiliza para mostrar la pestaña de presupuesto.
  */
-public class BudgetTabFragment extends Fragment {
+public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnDataChangeListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
     // TODO: Rename and change types of parameters
 
-    private final ArrayList<Expense> expenses = new ArrayList<>(); // Lista de gastos
-    private ArrayAdapter<Expense> adapter; // Adaptador para la vista ListView
+    ArrayList<Expense> expenses;
 
+    // Lista de gastos
     private TextView budgetDisplay;
     private EditText budgetEditText;
     private EditText expenseAmountEditText;
     private EditText expenseConceptEditText;
     private Button budget_button;
     private Button addExpenseButton;
+    private String budgetText;
+    private String uuid;
+    private ListView expensesListView;
+    private ExpenseAdapter expenseAdapter;
+    Expense expense;
+
+    Context context;
+
+    String tripId;
+    File directory;
+    File tripDirectory;
+    File file;
+
+    File expensesFile;
     private double budget = 0.0; // Presupuesto inicial
+
+    private ImageView reset_icon;
 
     /**
      * Constructor vacío requerido por la clase Fragment
@@ -60,15 +81,21 @@ public class BudgetTabFragment extends Fragment {
         expenseAmountEditText = rootView.findViewById(R.id.expense_amount_edittext);
         expenseConceptEditText = rootView.findViewById(R.id.expense_concept_edittext);
         addExpenseButton = rootView.findViewById(R.id.add_expense_button);
-        ListView expensesListView = rootView.findViewById(R.id.expenses_listview);
-        Context context = getActivity();
+        expensesListView = rootView.findViewById(R.id.expenses_listview);
+        reset_icon = rootView.findViewById(R.id.reset_icon);
+        expenses = new ArrayList<>();
+
+
 
         // Leer el valor del presupuesto guardado en el archivo de texto
         assert getArguments() != null;
-        String tripId = getArguments().getString("tripId");
-        File directory = new File(requireActivity().getFilesDir(), "Presupuesto");
-        File tripDirectory = new File(directory, tripId);
-        File file = new File(tripDirectory, "budget.txt");
+        tripId = getArguments().getString("tripId");
+        directory = new File(requireActivity().getFilesDir(), "Presupuesto")  ;
+        tripDirectory = new File(directory, tripId);
+        expenseAdapter = new ExpenseAdapter(getContext(), expenses, tripId);
+        expensesListView.setAdapter(expenseAdapter);
+        expenseAdapter.setOnDataChangeListener(this);
+        file = new File(tripDirectory, "budget.txt");
         boolean budgetFileExists = file.exists();
         if (budgetFileExists) {
             try (FileInputStream inputStream = new FileInputStream(file)) {
@@ -87,51 +114,45 @@ public class BudgetTabFragment extends Fragment {
                 expenseAmountEditText.setVisibility(View.VISIBLE);
                 expenseConceptEditText.setVisibility(View.VISIBLE);
                 addExpenseButton.setVisibility(View.VISIBLE);
+                reset_icon.setVisibility(View.VISIBLE);  // Añadir esta línea para mostrar el icono de reinicio
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            budget_button.setVisibility(View.VISIBLE);
+            budgetEditText.setVisibility(View.VISIBLE);
+            expenseAmountEditText.setVisibility(View.GONE);
+            expenseConceptEditText.setVisibility(View.GONE);
+            addExpenseButton.setVisibility(View.GONE);
+            reset_icon.setVisibility(View.GONE);
         }
 
         // Leer la lista de gastos guardada en el archivo de texto
-        File expensesFile = new File(tripDirectory, "registro_gastos.txt");
+        assert getArguments() != null;
+        tripId = getArguments().getString("tripId");
+        directory = new File(requireActivity().getFilesDir(), "Presupuesto")  ;
+        tripDirectory = new File(directory, tripId);
+        expensesFile = new File(tripDirectory, "registro_gastos.txt");
+
         if (expensesFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(expensesFile))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     String[] parts = line.split(";");
-                    double amount = Double.parseDouble(parts[0]);
-                    String concept = parts[1];
-                    Expense expense = new Expense(amount, concept);
+                    String uuid = parts[0];
+                    double amount = Double.parseDouble(parts[1]);
+                    String concept = parts[2];
+                    expense = new Expense(uuid, amount, concept);
                     expenses.add(expense);
+                    expenseAdapter.add(expense);
+
+                    // Actualizar el adaptador de la vista ListView
+                    expenseAdapter.notifyDataSetChanged();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
-        // Mostrar un mensaje de advertencia si el campo budget_edittext está vacío y no existe un archivo de texto con el valor del presupuesto guardado
-        if (budgetEditText.getText().toString().isEmpty() && !budgetFileExists) {
-            expenseAmountEditText.setVisibility(View.GONE);
-            expenseConceptEditText.setVisibility(View.GONE);
-            addExpenseButton.setVisibility(View.GONE);
-            assert context != null;
-            Tooltip tooltip = new Tooltip.Builder(budgetEditText)
-                    .setText("Establezca aquí el presupuesto que espera gastar durante el viaje")
-                    .setBackgroundColor(ContextCompat.getColor(context, R.color.verde_claro))
-                    .setTextColor(ContextCompat.getColor(context, R.color.white))
-
-                    .setGravity(Gravity.BOTTOM)
-                    .setCornerRadius(8f)
-                    .setDismissOnClick(true)
-                    .show();
-
-            // Programar la eliminación del mensaje después de 5 segundos
-            new Handler(Looper.getMainLooper()).postDelayed(tooltip::dismiss, 5000);
-        }
-
-        // Configurar el adaptador para la vista ListView
-        adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, expenses);
-        expensesListView.setAdapter(adapter);
 
         // Configurar el evento click del botón "Establecer presupuesto"
         budgetEditText.setOnEditorActionListener((v, actionId, event) -> {
@@ -166,9 +187,11 @@ public class BudgetTabFragment extends Fragment {
             else {
                 budget_button.setVisibility(View.GONE);
                 budgetEditText.setVisibility(View.GONE);
+                expensesListView.setVisibility(View.GONE);
                 expenseAmountEditText.setVisibility(View.VISIBLE);
                 expenseConceptEditText.setVisibility(View.VISIBLE);
                 addExpenseButton.setVisibility(View.VISIBLE);
+                reset_icon.setVisibility(View.VISIBLE);
                 setBudget();
             }
 
@@ -177,21 +200,150 @@ public class BudgetTabFragment extends Fragment {
         // Configurar el evento click del botón "Añadir gasto"
         addExpenseButton.setOnClickListener(v -> addExpense());
 
+        reset_icon.setOnClickListener(v -> {
+            // Mostrar una ventana de diálogo de confirmación
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Resetear presupuesto")
+                    .setMessage("¿Desea resetear el presupuesto?")
+                    .setPositiveButton("Sí", (dialog, which) -> {
+
+                        // Eliminar el archivo del almacenamiento interno
+                        budget = 0.0;  // Actualizar el presupuesto
+                        // Eliminar el elemento correspondiente de tus datos
+                        expenseAdapter.clear();
+                        // Notificar al adaptador que los datos han cambiado
+                        expenseAdapter.notifyDataSetChanged();
+
+                        Toast.makeText(getContext(), "Presupuesto reseteado correctamente", Toast.LENGTH_SHORT).show();
+                        budgetDisplay.setText(getString(R.string.budget_text, String.format(Locale.US, "%.2f", budget)));
+                        // Guardar el nuevo valor del presupuesto en el archivo de texto "budget.txt"
+                        assert getArguments() != null;
+                        directory = new File(requireActivity().getFilesDir(), "Presupuesto");
+                        tripDirectory = new File(String.valueOf(directory), tripId);
+                        File file1 = new File(tripDirectory, "budget.txt");
+                        if (file1.exists()){
+                            file1.delete();
+                        }
+                        File file2 = new File(tripDirectory, "registro_gastos.txt");
+                        if (file2.exists()) {
+                            file2.delete();
+                        }
+
+                        // Hacer que el campo para establecer el presupuesto y el botón correspondiente vuelvan a aparecer
+                        budget_button.setVisibility(View.VISIBLE);
+                        budgetEditText.setVisibility(View.VISIBLE);
+                        budgetEditText.setText("");  // Añadir esta línea para limpiar el campo budgetEditText
+                        reset_icon.setVisibility(View.GONE);
+                        expenseAmountEditText.setVisibility(View.GONE);
+                        expenseConceptEditText.setVisibility(View.GONE);
+                        addExpenseButton.setVisibility(View.GONE);
+                        expensesListView.setVisibility(View.GONE);
+                        budgetDisplay.setVisibility(View.GONE);
+
+                        verifyAmount();
+
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        });
+
+
         return rootView;
+    }
+
+        private void verifyAmount() {
+         context = getActivity();
+         boolean budgetFileExists = file.exists();
+
+         // Mostrar un mensaje de advertencia si el campo budget_edittext está vacío y no existe un archivo de texto con el valor del presupuesto guardado
+        if (budgetEditText.getText().toString().isEmpty() && !budgetFileExists) {
+            expenseAmountEditText.setVisibility(View.GONE);
+            reset_icon.setVisibility(View.GONE);
+            expenseConceptEditText.setVisibility(View.GONE);
+            addExpenseButton.setVisibility(View.GONE);
+            assert context != null;
+            Tooltip tooltip = new Tooltip.Builder(budgetEditText)
+                    .setText("Establezca aquí el presupuesto que espera gastar durante el viaje")
+                    .setBackgroundColor(ContextCompat.getColor(context, R.color.verde_claro))
+                    .setTextColor(ContextCompat.getColor(context, R.color.white))
+
+                    .setGravity(Gravity.BOTTOM)
+                    .setCornerRadius(8f)
+                    .setDismissOnClick(true)
+                    .show();
+
+            // Programar la eliminación del mensaje después de 5 segundos
+            new Handler(Looper.getMainLooper()).postDelayed(tooltip::dismiss, 4000);
+        }
+        else if (budget == 0) {
+                Toast.makeText(getContext(), "¡Has llegado al presupuesto! ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Añade un nuevo presupuesto para continuar", Toast.LENGTH_SHORT).show();
+            budget_button.setVisibility(View.VISIBLE);
+                budgetEditText.setVisibility(View.VISIBLE);
+                budgetDisplay.setVisibility(View.GONE);
+                reset_icon.setVisibility(View.GONE);
+                expenseAmountEditText.setVisibility(View.GONE);
+                expenseConceptEditText.setVisibility(View.GONE);
+                expensesListView.setVisibility(View.GONE);
+                addExpenseButton.setVisibility(View.GONE);
+            // Eliminar el archivo del almacenamiento interno
+            budget = 0.0;  // Actualizar el presupuesto
+            // Eliminar el elemento correspondiente de tus datos
+            expenseAdapter.clear();
+            // Notificar al adaptador que los datos han cambiado
+            expenseAdapter.notifyDataSetChanged();
+            File file1 = new File(tripDirectory, "budget.txt");
+            if (file1.exists()){
+                file1.delete();
+            }
+            File file2 = new File(tripDirectory, "registro_gastos.txt");
+            if (file2.exists()) {
+                file2.delete();
+            }
+            }
+        else if (budget < 0) {
+                Toast.makeText(getContext(), "¡Te has pasado del presupuesto!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Añade un nuevo presupuesto", Toast.LENGTH_SHORT).show();
+            budget_button.setVisibility(View.VISIBLE);
+                budgetEditText.setVisibility(View.VISIBLE);
+                budgetDisplay.setVisibility(View.GONE);
+                reset_icon.setVisibility(View.GONE);
+                expensesListView.setVisibility(View.GONE);
+                expenseAmountEditText.setVisibility(View.GONE);
+                expenseConceptEditText.setVisibility(View.GONE);
+                addExpenseButton.setVisibility(View.GONE);
+            // Eliminar el archivo del almacenamiento interno
+            budget = 0.0;  // Actualizar el presupuesto
+            // Eliminar el elemento correspondiente de tus datos
+            expenseAdapter.clear();
+            // Notificar al adaptador que los datos han cambiado
+            expenseAdapter.notifyDataSetChanged();
+            File file1 = new File(tripDirectory, "budget.txt");
+            if (file1.exists()){
+                file1.delete();
+            }
+            File file2 = new File(tripDirectory, "registro_gastos.txt");
+            if (file2.exists()) {
+                file2.delete();
+            }
+            }
+
+
     }
 
     private void setBudget() {
 
-        String budgetText = budgetEditText.getText().toString();
-
+        budgetText = budgetEditText.getText().toString();
 
         assert getArguments() != null;
         String tripId = getArguments().getString("tripId");
 
-
         if (!budgetText.isEmpty()) {
             budget = Double.parseDouble(budgetText);
+            expenseAdapter.setBudget(budget);
             updateBudgetDisplay();
+            // Hacer que budgetDisplay vuelva a ser visible
+            budgetDisplay.setVisibility(View.VISIBLE);
 
             // Guardar el valor del presupuesto en un archivo de texto
             File directory = new File(requireActivity().getFilesDir(), "Presupuesto");
@@ -211,13 +363,18 @@ public class BudgetTabFragment extends Fragment {
         }
     }
 
+
     private void updateBudgetDisplay() {
         // Gastos totales
         double totalExpenses = 0.0;
-        budgetDisplay.setText(String.format(Locale.US, "%.2f", budget - totalExpenses));
+        for (int i = 0; i < expenseAdapter.getCount(); i++) {
+            totalExpenses += expenseAdapter.getItem(i).getAmount();
+        }
+        budgetDisplay.setText(String.format(Locale.US, "%.2f", budget));
     }
 
     private void addExpense() {
+
         String amountText = expenseAmountEditText.getText().toString();
         String conceptText = expenseConceptEditText.getText().toString();
 
@@ -248,17 +405,23 @@ public class BudgetTabFragment extends Fragment {
 
             double expenseAmount = Double.parseDouble(amountText);
 
-            // Crear un nuevo objeto Expense y agregarlo a la lista de gastos
-            Expense expense = new Expense(expenseAmount, conceptText);
+            expensesListView.setVisibility(View.VISIBLE);
+            // Añade el gasto a la lista existente
+            // Generar un UUID
+            uuid = UUID.randomUUID().toString();
+            expense = new Expense(uuid, expenseAmount, conceptText);
             expenses.add(expense);
+            expenseAdapter.add(expense);
 
-            // Actualizar el adaptador de la vista ListView
-            adapter.notifyDataSetChanged();
+            // Notifica al adaptador que los datos han cambiado
+            expenseAdapter.notifyDataSetChanged();
 
             // Actualizar el total de gastos y el presupuesto restante
 
+            Log.d(TAG, "prebudget: " + budget);
             budget -= expenseAmount;
             updateBudgetDisplay();
+            Log.d(TAG, "postbudget: " + budget);
 
             // Limpiar los campos de entrada de gastos
             expenseAmountEditText.setText("");
@@ -266,22 +429,24 @@ public class BudgetTabFragment extends Fragment {
 
             // Guardar la lista de gastos en un archivo de texto
             saveExpenseList(amountText,conceptText);
+
             // Guardar el nuevo valor del presupuesto en el archivo de texto "budget.txt"
-            assert getArguments() != null;
-            String tripId = getArguments().getString("tripId");
-            File directory = new File(requireActivity().getFilesDir(), "Presupuesto");
-            File tripDirectory = new File(directory, tripId);
-            File file = new File(tripDirectory, "budget.txt");
-            try (FileOutputStream outputStream = new FileOutputStream(file)) {
-                outputStream.write(String.valueOf(budget).getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
+                assert getArguments() != null;
+                String tripId = getArguments().getString("tripId");
+                File directory = new File(requireActivity().getFilesDir(), "Presupuesto");
+                File tripDirectory = new File(directory, tripId);
+                File file = new File(tripDirectory, "budget.txt");
+                try (FileOutputStream outputStream = new FileOutputStream(file)) {
+                    outputStream.write(String.valueOf(budget).getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
+        verifyAmount();
+
     }
 
     private void saveExpenseList(String amountText, String conceptText){
-
         assert getArguments() != null;
         String tripId = getArguments().getString("tripId");
         File directory = new File(requireActivity().getFilesDir(), "Presupuesto");
@@ -294,27 +459,22 @@ public class BudgetTabFragment extends Fragment {
         }
         File file = new File(tripDirectory, "registro_gastos.txt");
         try (FileWriter writer = new FileWriter(file, true)) {
-            writer.append(amountText).append(";").append(conceptText).append("\n");
+            // Añadir el UUID, la cantidad y el concepto al archivo
+            writer.append(uuid).append(";").append(amountText).append(";").append(conceptText).append("\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // Clase para representar un gasto
-    private static class Expense {
-        double amount;
-        String concept;
+    @Override
+    public void onExpenseDeleted(double amount) {
 
-        public Expense(double amount, String concept) {
-            this.amount = amount;
-            this.concept = concept;
-        }
+            budget += amount;
+            budgetText = String.valueOf(budget);
+            updateBudgetDisplay();
+            verifyAmount();
 
-        @NotNull
-        @Override
-        public String toString() {
-            return concept + ": " + String.format(Locale.US, "%.2f", amount);
-        }
     }
+
 
 }

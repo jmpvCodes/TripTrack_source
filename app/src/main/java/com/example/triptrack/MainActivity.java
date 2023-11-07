@@ -1,11 +1,14 @@
 package com.example.triptrack;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
 import android.widget.*;
@@ -31,6 +34,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.List;
 import java.util.Objects;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 /**
  * Esta clase representa la pantalla principal de la aplicación.
  */
@@ -39,6 +44,15 @@ public class MainActivity extends AppCompatActivity {
     // Declaración de variables
     private DrawerLayout drawerLayout; 
     private TextView list_trips_text;
+
+    private CardView warningCard;
+
+    private int count = 0;
+
+    private String uid;
+
+    // Obtener una referencia a la base de datos
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     /**
      * Método que se ejecuta cuando se crea la actividad
@@ -61,45 +75,42 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Ocultar el título de la actividad
-        CardView warningCard = findViewById(R.id.warning_no_trips);
+        warningCard = findViewById(R.id.warning_no_trips);
         warningCard.setVisibility(View.GONE);
 
         // Ocultar el texto "No hay viajes"
         list_trips_text = findViewById(R.id.list_trips_text);
 
-        // Obtener una referencia a la base de datos
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
 
         // Obtener el ID del usuario actual
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         // Verificar si el usuario ha iniciado sesión
         if (user != null) {
-            String uid = user.getUid();
+            uid = user.getUid();
 
-            // Obtener todos los documentos de la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
+            verifyTrips();
+
+            // Obtener todos los documentos de la colección "viajes" que tienen el atributo "status" con valor "finalizado"
             db.collection("users").document(uid).collection("viajes")
-                    .whereNotEqualTo("status", "finalizado")
+                    .whereEqualTo("status", "finalizado")
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             List<DocumentSnapshot> documents = task.getResult().getDocuments();
-                            if (documents.size() > 0) {
-                                // Hay viajes en la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
-                                warningCard.setVisibility(View.GONE);
-                                list_trips_text.setVisibility(View.VISIBLE);
-                                loadTrips();
-                            } else {
-                                // No hay viajes en la colección "viajes" que no tengan el atributo "status" con valor "finalizado"
-                                warningCard.setVisibility(View.VISIBLE);
-                                LottieAnimationView animationView = findViewById(R.id.animation_view);
-                                animationView.cancelAnimation();
-                                animationView.setVisibility(View.GONE);
-                            }
-                        }  // Error al obtener los datos de la colección "viajes"
+                            count = documents.size();  // Contar los viajes finalizados
 
+                            SharedPreferences prefs = getSharedPreferences("ViajesFinalizados", Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putInt("viajes_finalizados", count);
+                            editor.apply();
+
+                        }
                     });
+
         }
+
 
         // Configurar el DrawerLayout
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -414,7 +425,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Actualizar los datos del viaje en la base de datos de Firebase
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
-                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
                 db.collection("users").document(uid).collection("viajes").document(tripId)
                         .update(
                                 "destination", newDestination,
@@ -462,19 +473,72 @@ public class MainActivity extends AppCompatActivity {
             builder.setTitle("¿Ha finalizado este viaje?");
             builder.setMessage("Si pulsa sobre \"Sí\" el viaje quedará guardado en \"Viajes finalizados\"");
             builder.setPositiveButton("Sí", (dialog, which) -> {
-                // TODO: Agregar código para completar el viaje y eliminarlo del menú principal
 
                 // Enviar un mensaje con el valor del destino a la actividad "MapamundiActivity"
                 Intent intent = new Intent("com.example.triptrack.DESTINATION_DATA");
                 intent.putExtra("destination", destination);
                 sendBroadcast(intent);
+                Log.d(TAG, "count: " + count);
+                count = count + 1;  // Contar los viajes finalizados
 
-                // Por ejemplo, puedes cambiar el estado del viaje a "finalizado" en la base de datos de Firestore
-                // y luego actualizar la interfaz de usuario para eliminar el Card del menú principal
+                SharedPreferences prefs = getSharedPreferences("ViajesFinalizados", Context.MODE_PRIVATE);
+                int exp = prefs.getInt("exp", 0);
+
+
+                if (count < 4) {
+                    exp = exp + 100;
+                    Toast.makeText(MainActivity.this, "Has ganado 100 puntos de experiencia por tu viaje", Toast.LENGTH_SHORT).show();
+                }
+                else if (count == 4) {
+
+                    exp = exp + 5000;
+                    Toast.makeText(MainActivity.this, "¡Has llegado al nivel 2! Has ganado 5000 puntos de experiencia", Toast.LENGTH_SHORT).show();
+                    exp = exp + 500;
+                    Toast.makeText(MainActivity.this, "Has ganado 500 puntos de experiencia por tu viaje", Toast.LENGTH_SHORT).show();
+
+                }
+                else if (count == 5) {
+                    exp = exp + 500;
+                    Toast.makeText(MainActivity.this, "Has ganado 500 puntos de experiencia por tu viaje", Toast.LENGTH_SHORT).show();
+                }
+
+
+                else if (count == 6) {
+
+                    exp = exp + 10000;
+                    Toast.makeText(MainActivity.this, "¡Has llegado al nivel 3! Has ganado 10000 puntos de experiencia", Toast.LENGTH_SHORT).show();
+                    exp = exp + 750;
+                    Toast.makeText(MainActivity.this, "Has ganado 750 puntos de experiencia por tu viaje", Toast.LENGTH_SHORT).show();
+
+                }
+                else if (count == 7) {
+                    exp = exp + 750;
+                    Toast.makeText(MainActivity.this, "Has ganado 750 puntos de experiencia", Toast.LENGTH_SHORT).show();
+                }
+
+                else if (count == 8) {
+
+                    exp = exp + 20000;
+                    Toast.makeText(MainActivity.this, "¡Has llegado al nivel 4! Has ganado 20000 puntos de experiencia", Toast.LENGTH_SHORT).show();
+                    exp = exp + 1000;
+                    Toast.makeText(MainActivity.this, "Has ganado 1000 puntos de experiencia por tu viaje", Toast.LENGTH_SHORT).show();
+
+                }
+
+                else {
+                    exp = exp + 1000;
+                    Toast.makeText(MainActivity.this, "Has ganado 1000 puntos de experiencia", Toast.LENGTH_SHORT).show();
+                }
+
+                prefs = getSharedPreferences("ViajesFinalizados", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt("viajes_finalizados", count);
+                editor.putInt("exp", exp);
+                editor.apply();
 
                 // Cambiar el estado del viaje a "finalizado" en la base de datos de Firestore
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
-                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
                 DocumentReference tripRef = db.collection("users").document(uid).collection("viajes").document(tripId);
 
                 tripRef.update("status", "finalizado")
@@ -496,6 +560,8 @@ public class MainActivity extends AppCompatActivity {
 
                             Toast.makeText(MainActivity.this, "Cargado en \"Viajes finalizados\"", Toast.LENGTH_SHORT).show();
                         });
+
+                verifyTrips();
             });
 
             builder.setNegativeButton("No", null);
@@ -521,7 +587,7 @@ public class MainActivity extends AppCompatActivity {
 
                         // Eliminar el viaje de la base de datos de Firebase
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
                         db.collection("users").document(uid).collection("viajes").document(tripId)
                                 .delete()
                                 .addOnSuccessListener(aVoid -> {
@@ -543,7 +609,7 @@ public class MainActivity extends AppCompatActivity {
 
 // Agregar el LinearLayout al CardView
         cardContentLayout.addView(iconsLayout);
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         tripCard.setOnClickListener(view -> {
             // Aquí puedes agregar el código para abrir la nueva Activity
             Intent intent = new Intent(MainActivity.this, InfoTripActivity.class);
@@ -556,6 +622,30 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("tripId",tripId);
             startActivity(intent);
         });
+
+    }
+    private void verifyTrips() {
+        // Obtener todos los documentos de la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
+        db.collection("users").document(uid).collection("viajes")
+                .whereNotEqualTo("status", "finalizado")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                        if (documents.size() > 0) {
+                            // Hay viajes en la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
+                            warningCard.setVisibility(View.GONE);
+                            list_trips_text.setVisibility(View.VISIBLE);
+                            loadTrips();
+                        } else {
+                            // No hay viajes en la colección "viajes" que no tengan el atributo "status" con valor "finalizado"
+                            warningCard.setVisibility(View.VISIBLE);
+                            LottieAnimationView animationView = findViewById(R.id.animation_view);
+                            animationView.cancelAnimation();
+                            animationView.setVisibility(View.GONE);
+                        }
+                    }  // Error al obtener los datos de la colección "viajes"
+                });
 
     }
 
@@ -573,7 +663,7 @@ public class MainActivity extends AppCompatActivity {
         animationView.playAnimation();
 
         // Obtener todos los documentos de la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         db.collection("users").document(uid).collection("viajes")
                 
                 .whereNotEqualTo("status", "finalizado") // Filtrar los viajes que no tienen el atributo "status" con valor "finalizado"
