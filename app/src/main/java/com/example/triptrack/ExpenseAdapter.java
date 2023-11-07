@@ -1,21 +1,20 @@
 package com.example.triptrack;
 
-import android.app.Activity;
 import android.content.Context;
-import android.media.Image;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
-import androidx.appcompat.app.AlertDialog;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
@@ -25,40 +24,25 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
  */
 public class ExpenseAdapter extends ArrayAdapter<Expense> {
 
-    OnDataChangeListener onDataChangeListener;
-    private final String tripId;
-    File filesDir;
-    private final List<Expense> expenses; // Añade este campo para almacenar la lista de gastos
-
-    private File tripDirectory;
+    private OnDataChangeListener onDataChangeListener;
+    private final File filesDir, tripDirectory;
+    private final List<Expense> expenses;
 
     public ExpenseAdapter(Context context, List<Expense> expenses, String tripId) {
         super(context, 0);
-        this.tripId = tripId;
         this.filesDir = context.getFilesDir();
-        this.expenses = expenses; // Almacena la lista de gastos en el campo
+        this.expenses = expenses;
 
-        // Usa filesDir para crear tripDirectory
+        // Se usa filesDir para crear tripDirectory
         File presupuestoDirectory = new File(filesDir, "Presupuesto");
         this.tripDirectory = new File(presupuestoDirectory, tripId);
     }
-
-    public void setBudget(double budget) {
+    public void setBudget() {
     }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Log.d(TAG, "Position: " + position);
-        Log.d(TAG, "Expenses size: " + expenses.size());
-        if (position < 0 || position >= expenses.size()) {
-            // position no es un índice válido para la lista expenses
-            // Inflar una nueva vista en lugar de devolver null
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list, parent, false);
-            Log.d(TAG, "expenses" + expenses);
-            return convertView;
-        }
 
-        Expense expense = expenses.get(position); // Usa la lista de gastos para obtener el gasto en la posición especificada
+        Expense expense = expenses.get(position);
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list, parent, false);
@@ -79,9 +63,8 @@ public class ExpenseAdapter extends ArrayAdapter<Expense> {
             notifyDataSetChanged();
 
             // Obtener los datos del gasto
-            String id = expense.getUid();  // Asume que tienes un método getId() en tu clase Expense
-            Log.d(TAG, "id: " + id);
-            Log.d(TAG, "tripDirectory: " + tripDirectory);
+            String id = expense.getUid();
+
             // Leer todos los gastos del archivo
             List<String> expenses = new ArrayList<>();
 
@@ -104,13 +87,10 @@ public class ExpenseAdapter extends ArrayAdapter<Expense> {
                     break;
                 }
             }
-
-
             // Llamar a onExpenseDeleted() para notificar que el gasto ha sido eliminado
             if(onDataChangeListener != null){
                 onDataChangeListener.onExpenseDeleted(expense.getAmount());
             }
-
 
             // Reescribir la lista en el archivo
             try (FileWriter writer = new FileWriter(new File(tripDirectory, "registro_gastos.txt"), false)) {  // false para sobrescribir el archivo
@@ -131,8 +111,6 @@ public class ExpenseAdapter extends ArrayAdapter<Expense> {
     public interface OnDataChangeListener{
         void onExpenseDeleted(double amount);
     }
-
-
     public void setOnDataChangeListener(OnDataChangeListener onDataChangeListener){
         this.onDataChangeListener = onDataChangeListener;
     }

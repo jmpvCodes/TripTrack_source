@@ -21,7 +21,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
@@ -39,27 +38,15 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
 
     // Lista de gastos
     private TextView budgetDisplay;
-    private EditText budgetEditText;
-    private EditText expenseAmountEditText;
-    private EditText expenseConceptEditText;
-    private Button budget_button;
-    private Button addExpenseButton;
-    private String budgetText;
-    private String uuid;
+    private EditText budgetEditText, expenseAmountEditText, expenseConceptEditText;
+    private Button budget_button, addExpenseButton;
+    private String budgetText, uuid, tripId;
     private ListView expensesListView;
     private ExpenseAdapter expenseAdapter;
-    Expense expense;
-
-    Context context;
-
-    String tripId;
-    File directory;
-    File tripDirectory;
-    File file;
-
-    File expensesFile;
+    private Expense expense;
+    private Context context;
+    private File directory, tripDirectory, file, expensesFile;
     private double budget = 0.0; // Presupuesto inicial
-
     private ImageView reset_icon;
 
     /**
@@ -85,74 +72,9 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
         reset_icon = rootView.findViewById(R.id.reset_icon);
         expenses = new ArrayList<>();
 
+        readBudget();
 
-
-        // Leer el valor del presupuesto guardado en el archivo de texto
-        assert getArguments() != null;
-        tripId = getArguments().getString("tripId");
-        directory = new File(requireActivity().getFilesDir(), "Presupuesto")  ;
-        tripDirectory = new File(directory, tripId);
-        expenseAdapter = new ExpenseAdapter(getContext(), expenses, tripId);
-        expensesListView.setAdapter(expenseAdapter);
-        expenseAdapter.setOnDataChangeListener(this);
-        file = new File(tripDirectory, "budget.txt");
-        boolean budgetFileExists = file.exists();
-        if (budgetFileExists) {
-            try (FileInputStream inputStream = new FileInputStream(file)) {
-                byte[] buffer = new byte[(int) file.length()];
-                inputStream.read(buffer);
-                String budgetText = new String(buffer);
-                budgetDisplay.setText(getString(R.string.budget_text, budgetText));
-                budgetDisplay.setVisibility(View.VISIBLE);
-
-                // Inicializar la variable budget con el valor leído del archivo de texto
-                budget = Double.parseDouble(budgetText);
-
-                // Ejecutar el bloque de código que se ejecuta cuando se pulsa sobre el botón "Añadir presupuesto"
-                budget_button.setVisibility(View.GONE);
-                budgetEditText.setVisibility(View.GONE);
-                expenseAmountEditText.setVisibility(View.VISIBLE);
-                expenseConceptEditText.setVisibility(View.VISIBLE);
-                addExpenseButton.setVisibility(View.VISIBLE);
-                reset_icon.setVisibility(View.VISIBLE);  // Añadir esta línea para mostrar el icono de reinicio
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            budget_button.setVisibility(View.VISIBLE);
-            budgetEditText.setVisibility(View.VISIBLE);
-            expenseAmountEditText.setVisibility(View.GONE);
-            expenseConceptEditText.setVisibility(View.GONE);
-            addExpenseButton.setVisibility(View.GONE);
-            reset_icon.setVisibility(View.GONE);
-        }
-
-        // Leer la lista de gastos guardada en el archivo de texto
-        assert getArguments() != null;
-        tripId = getArguments().getString("tripId");
-        directory = new File(requireActivity().getFilesDir(), "Presupuesto")  ;
-        tripDirectory = new File(directory, tripId);
-        expensesFile = new File(tripDirectory, "registro_gastos.txt");
-
-        if (expensesFile.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(expensesFile))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split(";");
-                    String uuid = parts[0];
-                    double amount = Double.parseDouble(parts[1]);
-                    String concept = parts[2];
-                    expense = new Expense(uuid, amount, concept);
-                    expenses.add(expense);
-                    expenseAdapter.add(expense);
-
-                    // Actualizar el adaptador de la vista ListView
-                    expenseAdapter.notifyDataSetChanged();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        readExpenses();
 
         // Configurar el evento click del botón "Establecer presupuesto"
         budgetEditText.setOnEditorActionListener((v, actionId, event) -> {
@@ -202,7 +124,7 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
 
         reset_icon.setOnClickListener(v -> {
             // Mostrar una ventana de diálogo de confirmación
-            new AlertDialog.Builder(getContext())
+            new AlertDialog.Builder(requireContext())
                     .setTitle("Resetear presupuesto")
                     .setMessage("¿Desea resetear el presupuesto?")
                     .setPositiveButton("Sí", (dialog, which) -> {
@@ -247,11 +169,10 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
                     .show();
         });
 
-
         return rootView;
     }
 
-        private void verifyAmount() {
+    private void verifyAmount() {
          context = getActivity();
          boolean budgetFileExists = file.exists();
 
@@ -330,7 +251,59 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
 
 
     }
+    private void readBudget(){
+        // Leer el valor del presupuesto guardado en el archivo de texto
+        assert getArguments() != null;
+        tripId = getArguments().getString("tripId");
+        directory = new File(requireActivity().getFilesDir(), "Presupuesto")  ;
+        tripDirectory = new File(directory, tripId);
+        expenseAdapter = new ExpenseAdapter(getContext(), expenses, tripId);
+        expensesListView.setAdapter(expenseAdapter);
+        expenseAdapter.setOnDataChangeListener(this);
+        file = new File(tripDirectory, "budget.txt");
+        boolean budgetFileExists = file.exists();
+        if (budgetFileExists) {
+            try (FileInputStream inputStream = new FileInputStream(file)) {
+                byte[] buffer = new byte[(int) file.length()];
+                inputStream.read(buffer);
+                String budgetText = new String(buffer);
+                budgetDisplay.setText(getString(R.string.budget_text, budgetText));
+                budgetDisplay.setVisibility(View.VISIBLE);
 
+                // Inicializar la variable budget con el valor leído del archivo de texto
+                budget = Double.parseDouble(budgetText);
+
+                // Ejecutar el bloque de código que se ejecuta cuando se pulsa sobre el botón "Añadir presupuesto"
+                budget_button.setVisibility(View.GONE);
+                budgetEditText.setVisibility(View.GONE);
+                expenseAmountEditText.setVisibility(View.VISIBLE);
+                expenseConceptEditText.setVisibility(View.VISIBLE);
+                addExpenseButton.setVisibility(View.VISIBLE);
+                reset_icon.setVisibility(View.VISIBLE);  // Añadir esta línea para mostrar el icono de reinicio
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Tooltip tooltip = new Tooltip.Builder(budgetEditText)
+                    .setText("Establezca aquí el presupuesto que espera gastar durante el viaje")
+                    .setBackgroundColor(ContextCompat.getColor(context, R.color.verde_claro))
+                    .setTextColor(ContextCompat.getColor(context, R.color.white))
+
+                    .setGravity(Gravity.BOTTOM)
+                    .setCornerRadius(8f)
+                    .setDismissOnClick(true)
+                    .show();
+
+            // Programar la eliminación del mensaje después de 5 segundos
+            new Handler(Looper.getMainLooper()).postDelayed(tooltip::dismiss, 4000);
+            budget_button.setVisibility(View.VISIBLE);
+            budgetEditText.setVisibility(View.VISIBLE);
+            expenseAmountEditText.setVisibility(View.GONE);
+            expenseConceptEditText.setVisibility(View.GONE);
+            addExpenseButton.setVisibility(View.GONE);
+            reset_icon.setVisibility(View.GONE);
+        }
+    }
     private void setBudget() {
 
         budgetText = budgetEditText.getText().toString();
@@ -340,7 +313,7 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
 
         if (!budgetText.isEmpty()) {
             budget = Double.parseDouble(budgetText);
-            expenseAdapter.setBudget(budget);
+            expenseAdapter.setBudget();
             updateBudgetDisplay();
             // Hacer que budgetDisplay vuelva a ser visible
             budgetDisplay.setVisibility(View.VISIBLE);
@@ -362,8 +335,6 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
             }
         }
     }
-
-
     private void updateBudgetDisplay() {
         // Gastos totales
         double totalExpenses = 0.0;
@@ -372,7 +343,6 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
         }
         budgetDisplay.setText(String.format(Locale.US, "%.2f", budget));
     }
-
     private void addExpense() {
 
         String amountText = expenseAmountEditText.getText().toString();
@@ -401,51 +371,75 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
             return;
         }
 
-        if (!amountText.isEmpty() && !conceptText.isEmpty()) {
+        double expenseAmount = Double.parseDouble(amountText);
 
-            double expenseAmount = Double.parseDouble(amountText);
+        expensesListView.setVisibility(View.VISIBLE);
+        // Añade el gasto a la lista existente
+        // Generar un UUID
+        uuid = UUID.randomUUID().toString();
+        expense = new Expense(uuid, expenseAmount, conceptText);
+        expenses.add(expense);
+        expenseAdapter.add(expense);
 
-            expensesListView.setVisibility(View.VISIBLE);
-            // Añade el gasto a la lista existente
-            // Generar un UUID
-            uuid = UUID.randomUUID().toString();
-            expense = new Expense(uuid, expenseAmount, conceptText);
-            expenses.add(expense);
-            expenseAdapter.add(expense);
+        // Notifica al adaptador que los datos han cambiado
+        expenseAdapter.notifyDataSetChanged();
 
-            // Notifica al adaptador que los datos han cambiado
-            expenseAdapter.notifyDataSetChanged();
+        // Actualizar el total de gastos y el presupuesto restante
 
-            // Actualizar el total de gastos y el presupuesto restante
+        Log.d(TAG, "prebudget: " + budget);
+        budget -= expenseAmount;
+        updateBudgetDisplay();
+        Log.d(TAG, "postbudget: " + budget);
 
-            Log.d(TAG, "prebudget: " + budget);
-            budget -= expenseAmount;
-            updateBudgetDisplay();
-            Log.d(TAG, "postbudget: " + budget);
+        // Limpiar los campos de entrada de gastos
+        expenseAmountEditText.setText("");
+        expenseConceptEditText.setText("");
 
-            // Limpiar los campos de entrada de gastos
-            expenseAmountEditText.setText("");
-            expenseConceptEditText.setText("");
+        // Guardar la lista de gastos en un archivo de texto
+        saveExpenseList(amountText,conceptText);
 
-            // Guardar la lista de gastos en un archivo de texto
-            saveExpenseList(amountText,conceptText);
-
-            // Guardar el nuevo valor del presupuesto en el archivo de texto "budget.txt"
-                assert getArguments() != null;
-                String tripId = getArguments().getString("tripId");
-                File directory = new File(requireActivity().getFilesDir(), "Presupuesto");
-                File tripDirectory = new File(directory, tripId);
-                File file = new File(tripDirectory, "budget.txt");
-                try (FileOutputStream outputStream = new FileOutputStream(file)) {
-                    outputStream.write(String.valueOf(budget).getBytes());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        // Guardar el nuevo valor del presupuesto en el archivo de texto "budget.txt"
+        assert getArguments() != null;
+        String tripId = getArguments().getString("tripId");
+        File directory = new File(requireActivity().getFilesDir(), "Presupuesto");
+        File tripDirectory = new File(directory, tripId);
+        File file = new File(tripDirectory, "budget.txt");
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            outputStream.write(String.valueOf(budget).getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         verifyAmount();
 
     }
+    private void readExpenses(){
+        // Leer la lista de gastos guardada en el archivo de texto
+        assert getArguments() != null;
+        tripId = getArguments().getString("tripId");
+        directory = new File(requireActivity().getFilesDir(), "Presupuesto")  ;
+        tripDirectory = new File(directory, tripId);
+        expensesFile = new File(tripDirectory, "registro_gastos.txt");
 
+        if (expensesFile.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(expensesFile))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(";");
+                    String uuid = parts[0];
+                    double amount = Double.parseDouble(parts[1]);
+                    String concept = parts[2];
+                    expense = new Expense(uuid, amount, concept);
+                    expenses.add(expense);
+                    expenseAdapter.add(expense);
+
+                    // Actualizar el adaptador de la vista ListView
+                    expenseAdapter.notifyDataSetChanged();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     private void saveExpenseList(String amountText, String conceptText){
         assert getArguments() != null;
         String tripId = getArguments().getString("tripId");
@@ -465,7 +459,6 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
             e.printStackTrace();
         }
     }
-
     @Override
     public void onExpenseDeleted(double amount) {
 
@@ -473,8 +466,22 @@ public class BudgetTabFragment extends Fragment implements ExpenseAdapter.OnData
             budgetText = String.valueOf(budget);
             updateBudgetDisplay();
             verifyAmount();
+            // Guardar el valor del presupuesto en un archivo de texto
+            File directory = new File(requireActivity().getFilesDir(), "Presupuesto");
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
+            File tripDirectory = new File(directory, tripId);
+            if (!tripDirectory.exists()) {
+                tripDirectory.mkdir();
+            }
+            File file = new File(tripDirectory, "budget.txt");
+            try (FileOutputStream outputStream = new FileOutputStream(file)) {
+                outputStream.write(budgetText.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
     }
-
 
 }
