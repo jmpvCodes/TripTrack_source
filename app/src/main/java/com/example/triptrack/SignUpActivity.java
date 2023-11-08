@@ -2,9 +2,7 @@ package com.example.triptrack;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -51,7 +49,6 @@ public class SignUpActivity extends AppCompatActivity {
      * Método que se ejecuta cuando se crea la actividad
      * @param savedInstanceState estado de la instancia guardada
      */
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,10 +73,7 @@ public class SignUpActivity extends AppCompatActivity {
         otherUsersText.setOnClickListener(v -> transitionBack());
 
         // Registro de usuario
-        SignUpButton.setOnClickListener(v -> {
-            validate();
-
-        });
+        SignUpButton.setOnClickListener(v -> validate());
         // Inicialización de Firebase
         mAuth = FirebaseAuth.getInstance();
     }
@@ -101,7 +95,7 @@ public class SignUpActivity extends AppCompatActivity {
                         if (user != null) {
                             // Crea un UserProfileChangeRequest para establecer el nombre de perfil del usuario
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                    .setDisplayName(nameInputText.getText().toString() + " " + surnameInputText.getText().toString())
+                                    .setDisplayName(Objects.requireNonNull(nameInputText.getText()) + " " + Objects.requireNonNull(surnameInputText.getText()))
                                     .build();
 
                             // Actualiza el perfil del usuario
@@ -117,7 +111,7 @@ public class SignUpActivity extends AppCompatActivity {
                             Map<String, Object> userData = new HashMap<>();
                             userData.put("Nombre: ", nameInputText.getText().toString());
                             userData.put("Apellidos: ", surnameInputText.getText().toString());
-                            userData.put("Email: ",emailEditText.getText().toString());
+                            userData.put("Email: ", Objects.requireNonNull(emailEditText.getText()).toString());
                             db.collection("users").document(user.getUid()).set(userData);
                         }
 

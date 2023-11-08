@@ -4,36 +4,23 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.firebase.auth.*;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * Esta clase representa la pantalla de inicio de sesión de la aplicación.
@@ -92,16 +79,9 @@ public class LoginActivity extends AppCompatActivity {
 
             // Comprueba la versión de Android
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(LoginActivity.this, pairs);
+            startActivity(intent, options.toBundle());
 
-                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(LoginActivity.this, pairs);
-                startActivity(intent, options.toBundle());
-
-            } else {
-
-                startActivity(intent);
-                finish();
-            }
         });
 
         // Configuración de listener para el botón de inicio de sesión
@@ -109,12 +89,12 @@ public class LoginActivity extends AppCompatActivity {
 
         // Configuración de listener para el botón de recuperación de contraseña
         forgotPassText.setOnClickListener(v -> {
-            String emailAddress = emailEditText.getText().toString().trim();
+            String emailAddress = Objects.requireNonNull(emailEditText.getText()).toString().trim();
 
             // Comprueba si el correo electrónico está registrado en Firebase
             mAuth.fetchSignInMethodsForEmail(emailAddress)
                     .addOnCompleteListener(task -> {
-                        boolean isNewUser = task.getResult().getSignInMethods().isEmpty();
+                        boolean isNewUser = Objects.requireNonNull(task.getResult().getSignInMethods()).isEmpty();
 
                         // Si el correo electrónico no está registrado, se muestra un mensaje de error
                         if (isNewUser) {
@@ -123,13 +103,10 @@ public class LoginActivity extends AppCompatActivity {
 
                         } else {
                             mAuth.sendPasswordResetEmail(emailAddress)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                Toast.makeText(LoginActivity.this, "Email enviado", Toast.LENGTH_LONG).show();
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            Toast.makeText(LoginActivity.this, "Email enviado", Toast.LENGTH_LONG).show();
 
-                                            }
                                         }
                                     });
                         }

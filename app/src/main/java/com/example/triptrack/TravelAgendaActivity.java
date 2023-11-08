@@ -1,5 +1,6 @@
 package com.example.triptrack;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
@@ -50,7 +51,7 @@ public class TravelAgendaActivity extends AppCompatActivity {
 
         // Configurar el botón de retroceso
         ImageButton backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> onBackPressed());;
+        backButton.setOnClickListener(v -> onBackPressed());
 
         tripId = getIntent().getStringExtra("tripId");
 
@@ -80,7 +81,7 @@ public class TravelAgendaActivity extends AppCompatActivity {
             calendar.set(Calendar.MONTH, date.getMonth());
             calendar.set(Calendar.DAY_OF_MONTH, date.getDay());
             long dateInMillis = calendar.getTimeInMillis();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             String formattedDate = dateFormat.format(new Date(dateInMillis));
             Log.d("TravelAgendaActivity", "Fecha seleccionada: " + formattedDate);
 

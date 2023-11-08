@@ -1,10 +1,10 @@
 package com.example.triptrack;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.os.Build;
-import android.os.Handler;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Pair;
 import android.view.View;
 import android.view.animation.Animation;
@@ -14,7 +14,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -27,6 +26,7 @@ import com.google.firebase.auth.FirebaseUser;
  */
 
 
+@SuppressLint("CustomSplashScreen")
 public class SplashScreenActivity extends AppCompatActivity {
 
     /**
@@ -46,7 +46,7 @@ public class SplashScreenActivity extends AppCompatActivity {
      * Método que inicializa las animaciones para la pantalla de bienvenida. Carga dos animaciones desde archivos XML
      * en la carpeta "Anim" y las asocia con las vistas apropiadas en el diseño. También carga una imagen usando Glide
      * y la establece como origen para un ImageView.
-     *
+     * <p>
      * Después de inicializar las animaciones e imagen, el método crea un nuevo objeto Handler y lo usa para publicar
      * una acción retrasada que lanzará la actividad apropiada después de 4 segundos. Si el usuario no ha iniciado sesión,
      * se lanza la actividad SignUpActivity. De lo contrario, se lanza LoginActivity con una animación de transición de
@@ -80,15 +80,15 @@ public class SplashScreenActivity extends AppCompatActivity {
             GoogleSignIn.getLastSignedInAccount(SplashScreenActivity.this);
 
             //Si el usuario no ha iniciado sesión, se lanza la actividad SignUpActivity.
+            Intent intent;
             if (user == null) {
 
-                Intent intent = new Intent(SplashScreenActivity.this, SignUpActivity.class);
+                intent = new Intent(SplashScreenActivity.this, SignUpActivity.class);
                 startActivity(intent);
-                finish();
 
             } else {
                 //De lo contrario, se lanza LoginActivity con una animación de transición de elemento compartido.
-                Intent intent = new Intent(SplashScreenActivity.this, LoginActivity.class);
+                intent = new Intent(SplashScreenActivity.this, LoginActivity.class);
 
                 /*Se crea un Array de pares para crear una transición que se solape con la siguiente activity.
                 Donde el primer elemento es el objeto que se coge de la splash screen y el segundo es donde se coloca
@@ -100,17 +100,11 @@ public class SplashScreenActivity extends AppCompatActivity {
 
                 //Se realiza una verifiación de la versión ya que versiones anteriores a Lollipop no podría realizar
                 //dicho solapamiento.
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(SplashScreenActivity.this, pairs);
+                startActivity(intent, options.toBundle());
 
-                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(SplashScreenActivity.this, pairs);
-                    startActivity(intent, options.toBundle());
-
-                } else {
-                    startActivity(intent);
-                    finish();
-
-                }
             }
+            finish();
 
         }, 4000);
     }

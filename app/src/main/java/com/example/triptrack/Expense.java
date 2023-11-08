@@ -1,9 +1,5 @@
 package com.example.triptrack;
 
-import com.google.firebase.database.annotations.NotNull;
-
-import java.util.Locale;
-
 /**
  * Esta clase representa un documento que se puede cargar en Firebase Storage.
  * Un documento tiene un nombre y una ruta.
@@ -14,21 +10,40 @@ public class Expense {
         double amount;
         String concept;
 
+    /**
+     * Método constructor de la clase.
+     * Crea un gasto.
+     * @param uid ID del gasto
+     * @param amount cantidad del gasto
+     * @param concept concepto del gasto
+     */
         public Expense(String uid, double amount, String concept) {
             this.amount = amount;
             this.concept = concept;
             this.uid = uid;
         }
 
-        public double getAmount() {
+    /**
+     * Método para obtener la cantidad del gasto.
+     * @return cantidad del gasto
+     */
+    public double getAmount() {
             return amount;
         }
 
-        public String getUid() {
+    /**
+     *  Método para obtener el ID del gasto.
+     * @return ID del gasto
+     */
+    public String getUid() {
             return uid;
         }
 
-        public String getConcept() {
+    /**
+     * Método para obtener el concepto del gasto.
+     * @return concepto del gasto
+     */
+    public String getConcept() {
             return concept;
         }
 

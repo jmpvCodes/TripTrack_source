@@ -39,7 +39,7 @@ public class FinishedTripsActivity extends AppCompatActivity {
 
     private CardView warningCard;
 
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private String uid;
 
@@ -116,7 +116,7 @@ public class FinishedTripsActivity extends AppCompatActivity {
     private void loadTrips() {
         // Obtener una referencia a la base de datos
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
         // Obtener todos los documentos de la colección "viajes" que tienen el atributo "status" con valor "finalizado"
         db.collection("users").document(uid).collection("viajes")

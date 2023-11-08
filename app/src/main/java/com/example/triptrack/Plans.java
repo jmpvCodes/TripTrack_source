@@ -1,5 +1,6 @@
 package com.example.triptrack;
 
+import android.annotation.SuppressLint;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
@@ -11,7 +12,7 @@ import java.util.Date;
  */
 public class Plans {
     private String tripId;
-    private long date;
+    private final long date;
     private String time;
     private String location;
     private int priority;
@@ -131,7 +132,7 @@ public class Plans {
     @NotNull
     @Override
     public String toString() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); // Formato de fecha
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); // Formato de fecha
         String dateString = dateFormat.format(new Date(date));
 
         return dateString + " - " + time + " - " + location + " - " + description;

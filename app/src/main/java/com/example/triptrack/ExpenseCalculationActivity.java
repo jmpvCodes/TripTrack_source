@@ -36,7 +36,7 @@ public class ExpenseCalculationActivity extends AppCompatActivity {
 
         // Configurar el botón de retroceso
         ImageButton backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> onBackPressed());; // Generar la barra de herramientas
+        backButton.setOnClickListener(v -> onBackPressed());// Generar la barra de herramientas
 
         String tripId = getIntent().getStringExtra("tripId"); // Obtener el ID del viaje
 

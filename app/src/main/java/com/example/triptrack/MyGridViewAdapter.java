@@ -17,10 +17,10 @@ import java.util.List;
  * El adaptador se utiliza en la actividad AlbumPhotoActivity para mostrar una cuadrícula de imágenes.
  */
 public class MyGridViewAdapter extends BaseAdapter {
-    private Context context;
-    private List<Bitmap> imageList;
+    private final Context context;
+    private final List<Bitmap> imageList;
 
-    private List<String> fileNames;
+    private final List<String> fileNames;
 
 
     /**
@@ -30,7 +30,7 @@ public class MyGridViewAdapter extends BaseAdapter {
      */
     public MyGridViewAdapter(Context context, List<Bitmap> imageList) {
         this.context = context;
-        this.imageList = imageList != null ? imageList : new ArrayList<Bitmap>();
+        this.imageList = imageList != null ? imageList : new ArrayList<>();
         this.fileNames = new ArrayList<>();
 
     }

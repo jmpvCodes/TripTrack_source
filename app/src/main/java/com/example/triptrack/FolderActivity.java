@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AlertDialog;
@@ -37,15 +36,11 @@ public class FolderActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_PICK = 2;
 
-    private View rootView;
-
     private LottieAnimationView lottieAnimationView;
 
     private TextView messageTextView, messageTextView2;
 
     private FloatingActionButton createFolderButton;
-
-    private Bitmap imageBitmap;
 
     private GridView gridView;
 
@@ -64,7 +59,7 @@ public class FolderActivity extends AppCompatActivity {
 
         // Configurar el botón de retroceso
         ImageButton backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> onBackPressed());; // Generar la barra de herramientas
+        backButton.setOnClickListener(v -> onBackPressed());// Generar la barra de herramientas
 
         String tripId = getIntent().getStringExtra("tripId");
         String folderName = getIntent().getStringExtra("folderName");
@@ -187,57 +182,45 @@ public class FolderActivity extends AppCompatActivity {
             return true;
         });
 
-        createFolderButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Acciones a realizar cuando se hace clic en el LinearLayout
+        createFolderButton.setOnClickListener(v -> {
+            // Acciones a realizar cuando se hace clic en el LinearLayout
 
-                PopupMenu popupMenu = new PopupMenu(FolderActivity.this, v);
-                popupMenu.getMenu().add("Cámara");
-                popupMenu.getMenu().add("Galería");
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (item.getTitle().equals("Cámara")) {
-                            // Acciones a realizar cuando se selecciona la opción "Cámara"
-                            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                            startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-                        } else if (item.getTitle().equals("Galería")) {
-                            // Acciones a realizar cuando se selecciona la opción "Galería"
-                            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                            startActivityForResult(intent, REQUEST_IMAGE_PICK);
-                        }
-                        return true;
-                    }
-                });
-                popupMenu.show();
-            }
+            PopupMenu popupMenu = new PopupMenu(FolderActivity.this, v);
+            popupMenu.getMenu().add("Cámara");
+            popupMenu.getMenu().add("Galería");
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if (item.getTitle().equals("Cámara")) {
+                    // Acciones a realizar cuando se selecciona la opción "Cámara"
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                } else if (item.getTitle().equals("Galería")) {
+                    // Acciones a realizar cuando se selecciona la opción "Galería"
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(intent, REQUEST_IMAGE_PICK);
+                }
+                return true;
+            });
+            popupMenu.show();
         });
-        lottieAnimationView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Acciones a realizar cuando se hace clic en el LinearLayout
+        lottieAnimationView.setOnClickListener(v -> {
+            // Acciones a realizar cuando se hace clic en el LinearLayout
 
-                PopupMenu popupMenu = new PopupMenu(FolderActivity.this, v);
-                popupMenu.getMenu().add("Cámara");
-                popupMenu.getMenu().add("Galería");
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (item.getTitle().equals("Cámara")) {
-                            // Acciones a realizar cuando se selecciona la opción "Cámara"
-                            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                            startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-                        } else if (item.getTitle().equals("Galería")) {
-                            // Acciones a realizar cuando se selecciona la opción "Galería"
-                            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                            startActivityForResult(intent, REQUEST_IMAGE_PICK);
-                        }
-                        return true;
-                    }
-                });
-                popupMenu.show();
-            }
+            PopupMenu popupMenu = new PopupMenu(FolderActivity.this, v);
+            popupMenu.getMenu().add("Cámara");
+            popupMenu.getMenu().add("Galería");
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if (item.getTitle().equals("Cámara")) {
+                    // Acciones a realizar cuando se selecciona la opción "Cámara"
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                } else if (item.getTitle().equals("Galería")) {
+                    // Acciones a realizar cuando se selecciona la opción "Galería"
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(intent, REQUEST_IMAGE_PICK);
+                }
+                return true;
+            });
+            popupMenu.show();
         });
 
         bottomNavigationView.setOnItemSelectedListener(
@@ -274,6 +257,7 @@ public class FolderActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        Bitmap imageBitmap;
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             // Acciones a realizar cuando se captura una imagen con la cámara
             Bundle extras = data.getExtras();

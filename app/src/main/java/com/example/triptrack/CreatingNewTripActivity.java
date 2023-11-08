@@ -43,7 +43,7 @@ public class CreatingNewTripActivity extends AppCompatActivity {
 
         // Configurar el botón de retroceso
         ImageButton backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> onBackPressed());; //Generación de Toolbar
+        backButton.setOnClickListener(v -> onBackPressed());//Generación de Toolbar
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(

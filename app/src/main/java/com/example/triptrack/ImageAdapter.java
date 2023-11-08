@@ -26,13 +26,12 @@ public class ImageAdapter extends BaseAdapter {
     /*
         * Declarar las variables que se utilizarán en la clase
      */
-    private Context context;
+    private final Context context;
     private File[] files;
-    private Set<Integer> selectedPositions = new HashSet<>();
-    private boolean selectionMode = false;
-    private List<Bitmap> imageList;
+    private final Set<Integer> selectedPositions = new HashSet<>();
+    private final List<Bitmap> imageList;
 
-    private List<String> fileNames;
+    private final List<String> fileNames;
 
 
     /**

@@ -48,7 +48,7 @@ public class ImportDocumentsActivity extends AppCompatActivity {
 
         // Configurar el botón de retroceso
         ImageButton backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> onBackPressed());; // Generar la barra de herramientas
+        backButton.setOnClickListener(v -> onBackPressed());// Generar la barra de herramientas
 
         documentTypeRadioGroup = findViewById(R.id.document_type_radio_group);
 
@@ -114,6 +114,7 @@ public class ImportDocumentsActivity extends AppCompatActivity {
          * Crea un intento de selección de documentos y lo envía a la actividad apropiada.
          * El resultado de la actividad se recibe en onActivityResult.
          */
+        @SuppressLint("NonConstantResourceId")
         private void performFileSearch() {
 
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT); // Crear un intento de selección de documentos

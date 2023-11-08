@@ -1,28 +1,25 @@
 package com.example.triptrack;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import com.airbnb.lottie.LottieAnimationView;
 import com.airbnb.lottie.LottieDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.tooltip.Tooltip;
-import org.w3c.dom.Text;
 
 import java.util.Objects;
 
@@ -37,6 +34,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -153,13 +151,13 @@ public class ProfileActivity extends AppCompatActivity {
             levelAnimation.setRepeatCount(LottieDrawable.INFINITE);
             congratulationsMessage.setText("Enhorabuena. Eres un viajero EXPLORADOR! Has realizado " + finishedTrips + " viajes!. Completa " + (4 - finishedTrips) + " viajes más para subir de nivel");
         }
-        else if (finishedTrips == 4 || finishedTrips > 4 && finishedTrips < 6) {
+        else if (finishedTrips == 4 || finishedTrips == 5) {
             levelText.setText("2");
             levelAnimation.setAnimation(R.raw.level2);
             levelAnimation.setRepeatCount(LottieDrawable.INFINITE);
             congratulationsMessage.setText("Enhorabuena. Eres un viajero AVENTURERO! Has realizado " + finishedTrips + " viajes!. Completa " + (6 - finishedTrips) + " viajes más para subir de nivel");
         }
-        else if (finishedTrips >= 6 && finishedTrips < 8) {
+        else if (finishedTrips < 8) {
             levelText.setText("3");
             levelAnimation.setAnimation(R.raw.level3);
             levelAnimation.setRepeatCount(LottieDrawable.INFINITE);

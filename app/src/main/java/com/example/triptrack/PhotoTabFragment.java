@@ -1,7 +1,6 @@
 package com.example.triptrack;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -10,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.*;
-import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -37,8 +35,6 @@ public class PhotoTabFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
-    private String mParam2;
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_PICK = 2;
@@ -87,7 +83,7 @@ public class PhotoTabFragment extends Fragment {
         if (getArguments() != null) {
             // TODO: Rename and change types of parameters
             String mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            String mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -110,6 +106,7 @@ public class PhotoTabFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        assert getArguments() != null;
         String tripId = getArguments().getString("tripId");
 
         lottieAnimationView = view.findViewById(R.id.lottieAnimationView);
@@ -134,14 +131,11 @@ public class PhotoTabFragment extends Fragment {
         File directory = new File(getActivity().getFilesDir(), "Galería/" + tripId);
 
         // Crear un FileFilter para obtener solo los archivos con extensiones específicas
-        FileFilter filter = new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                // Obtener la extensión del archivo
-                String extension = file.getName().substring(file.getName().lastIndexOf(".") + 1);
-                // Verificar si la extensión del archivo es una de las extensiones permitidas
-                return extension.equals("jpg") || extension.equals("png") || extension.equals("mp4") || extension.equals("jpeg") ;
-            }
+        FileFilter filter = file -> {
+            // Obtener la extensión del archivo
+            String extension = file.getName().substring(file.getName().lastIndexOf(".") + 1);
+            // Verificar si la extensión del archivo es una de las extensiones permitidas
+            return extension.equals("jpg") || extension.equals("png") || extension.equals("mp4") || extension.equals("jpeg") ;
         };
 
 // Obtener la lista de archivos que cumplen con el filtro
@@ -172,31 +166,25 @@ public class PhotoTabFragment extends Fragment {
                 gridViewAdapter.add(imageBitmap, fileName);
                 gridViewAdapter.notifyDataSetChanged();
             }
-            createFolderButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Acciones a realizar cuando se hace clic en el LinearLayout
+            createFolderButton.setOnClickListener(v -> {
+                // Acciones a realizar cuando se hace clic en el LinearLayout
 
-                    PopupMenu popupMenu = new PopupMenu(getActivity(), v);
-                    popupMenu.getMenu().add("Cámara");
-                    popupMenu.getMenu().add("Galería");
-                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getTitle().equals("Cámara")) {
-                                // Acciones a realizar cuando se selecciona la opción "Cámara"
-                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-                            } else if (item.getTitle().equals("Galería")) {
-                                // Acciones a realizar cuando se selecciona la opción "Galería"
-                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent, REQUEST_IMAGE_PICK);
-                            }
-                            return true;
-                        }
-                    });
-                    popupMenu.show();
-                }
+                PopupMenu popupMenu = new PopupMenu(getActivity(), v);
+                popupMenu.getMenu().add("Cámara");
+                popupMenu.getMenu().add("Galería");
+                popupMenu.setOnMenuItemClickListener(item -> {
+                    if (item.getTitle().equals("Cámara")) {
+                        // Acciones a realizar cuando se selecciona la opción "Cámara"
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                    } else if (item.getTitle().equals("Galería")) {
+                        // Acciones a realizar cuando se selecciona la opción "Galería"
+                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(intent, REQUEST_IMAGE_PICK);
+                    }
+                    return true;
+                });
+                popupMenu.show();
             });
 
         } else {
@@ -205,128 +193,100 @@ public class PhotoTabFragment extends Fragment {
             messageTextView.setVisibility(View.VISIBLE);
             messageTextView2.setVisibility(View.VISIBLE);
             createFolderButton.setVisibility(View.GONE);
-            createFolderButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Acciones a realizar cuando se hace clic en el LinearLayout
+            createFolderButton.setOnClickListener(v -> {
+                // Acciones a realizar cuando se hace clic en el LinearLayout
 
-                    PopupMenu popupMenu = new PopupMenu(getActivity(), v);
-                    popupMenu.getMenu().add("Cámara");
-                    popupMenu.getMenu().add("Galería");
-                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getTitle().equals("Cámara")) {
-                                // Acciones a realizar cuando se selecciona la opción "Cámara"
-                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-                            } else if (item.getTitle().equals("Galería")) {
-                                // Acciones a realizar cuando se selecciona la opción "Galería"
-                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent, REQUEST_IMAGE_PICK);
-                            }
-                            return true;
-                        }
-                    });
-                    popupMenu.show();
-                }
+                PopupMenu popupMenu = new PopupMenu(getActivity(), v);
+                popupMenu.getMenu().add("Cámara");
+                popupMenu.getMenu().add("Galería");
+                popupMenu.setOnMenuItemClickListener(item -> {
+                    if (item.getTitle().equals("Cámara")) {
+                        // Acciones a realizar cuando se selecciona la opción "Cámara"
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                    } else if (item.getTitle().equals("Galería")) {
+                        // Acciones a realizar cuando se selecciona la opción "Galería"
+                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(intent, REQUEST_IMAGE_PICK);
+                    }
+                    return true;
+                });
+                popupMenu.show();
             });
 
-            lottieAnimationView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Acciones a realizar cuando se hace clic en el LinearLayout
+            lottieAnimationView.setOnClickListener(v -> {
+                // Acciones a realizar cuando se hace clic en el LinearLayout
 
-                    PopupMenu popupMenu = new PopupMenu(getActivity(), v);
-                    popupMenu.getMenu().add("Cámara");
-                    popupMenu.getMenu().add("Galería");
-                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            if (item.getTitle().equals("Cámara")) {
-                                // Acciones a realizar cuando se selecciona la opción "Cámara"
-                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-                            } else if (item.getTitle().equals("Galería")) {
-                                // Acciones a realizar cuando se selecciona la opción "Galería"
-                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent, REQUEST_IMAGE_PICK);
-                            }
-                            return true;
-                        }
-                    });
-                    popupMenu.show();
-                }
+                PopupMenu popupMenu = new PopupMenu(getActivity(), v);
+                popupMenu.getMenu().add("Cámara");
+                popupMenu.getMenu().add("Galería");
+                popupMenu.setOnMenuItemClickListener(item -> {
+                    if (item.getTitle().equals("Cámara")) {
+                        // Acciones a realizar cuando se selecciona la opción "Cámara"
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                    } else if (item.getTitle().equals("Galería")) {
+                        // Acciones a realizar cuando se selecciona la opción "Galería"
+                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(intent, REQUEST_IMAGE_PICK);
+                    }
+                    return true;
+                });
+                popupMenu.show();
             });
         }
 
-        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                // Crear el menú contextual
-                PopupMenu popupMenu = new PopupMenu(getActivity(), view);
-                // Obtener las carpetas disponibles y agregarlas al submenú
-                Menu menu = popupMenu.getMenu();
-                SubMenu subMenu = menu.addSubMenu("Enviar a");
-                // Obtener la lista de carpetas en la carpeta tripId
-                String tripId = getActivity().getIntent().getStringExtra("tripId");
-                File directory = new File(getActivity().getFilesDir(), "Galería/" + tripId);
-                File[] folders = directory.listFiles(new FileFilter() {
-                    @Override
-                    public boolean accept(File file) {
-                        return file.isDirectory();
-                    }
-                });
-                for (File folder : folders) {
-                    subMenu.add(folder.getName());
+        gridView.setOnItemLongClickListener((parent, view1, position, id) -> {
+            // Crear el menú contextual
+            PopupMenu popupMenu = new PopupMenu(getActivity(), view1);
+            // Obtener las carpetas disponibles y agregarlas al submenú
+            Menu menu = popupMenu.getMenu();
+            SubMenu subMenu = menu.addSubMenu("Enviar a");
+            // Obtener la lista de carpetas en la carpeta tripId
+            String tripId1 = getActivity().getIntent().getStringExtra("tripId");
+            File directory1 = new File(getActivity().getFilesDir(), "Galería/" + tripId1);
+            File[] folders = directory1.listFiles(File::isDirectory);
+            assert folders != null;
+            for (File folder : folders) {
+                subMenu.add(folder.getName());
+            }
+            // Agregar la opción "Borrar" al menú contextual
+            menu.add("Borrar");
+            popupMenu.setOnMenuItemClickListener(item -> {
+                if (item.getTitle().equals("Borrar")) {
+                    // Mostrar un mensaje de confirmación antes de eliminar la imagen
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle("Borrar imagen")
+                            .setMessage("¿Está seguro que desea eliminar esta imagen de TripTrack?")
+                            .setPositiveButton("Sí", (dialog, which) -> {
+                                // Eliminar la imagen del almacenamiento interno de la aplicación
+                                deleteImage(position);
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
+                } else if (item.hasSubMenu()) {
+                    // No hacer nada si se selecciona el submenú "Enviar a"
+                } else {
+                    // Acciones a realizar cuando se selecciona una carpeta
+                    // Por ejemplo, guardar la imagen en la carpeta seleccionada
+                    saveImageToFolder(position, item.getTitle().toString());
                 }
-                // Agregar la opción "Borrar" al menú contextual
-                menu.add("Borrar");
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (item.getTitle().equals("Borrar")) {
-                            // Mostrar un mensaje de confirmación antes de eliminar la imagen
-                            new AlertDialog.Builder(getActivity())
-                                    .setTitle("Borrar imagen")
-                                    .setMessage("¿Está seguro que desea eliminar esta imagen de TripTrack?")
-                                    .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            // Eliminar la imagen del almacenamiento interno de la aplicación
-                                            deleteImage(position);
-                                        }
-                                    })
-                                    .setNegativeButton("No", null)
-                                    .show();
-                        } else if (item.hasSubMenu()) {
-                            // No hacer nada si se selecciona el submenú "Enviar a"
-                        } else {
-                            // Acciones a realizar cuando se selecciona una carpeta
-                            // Por ejemplo, guardar la imagen en la carpeta seleccionada
-                            saveImageToFolder(position, item.getTitle().toString());
-                        }
-                        return true;
-                    }
-                });
-                popupMenu.show();
                 return true;
-            }
+            });
+            popupMenu.show();
+            return true;
         });
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Obtener el nombre del archivo en la posición especificada
-                String fileName = gridViewAdapter.getFileName(position);
-                // Crear un Intent para abrir el archivo
-                String tripId = getActivity().getIntent().getStringExtra("tripId");
-                File file = new File(getActivity().getFilesDir(), "Galería/" + tripId + "/" + fileName);
-                Uri uri = FileProvider.getUriForFile(getActivity(), BuildConfig.APPLICATION_ID + ".provider", file);
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(uri, "image/*");
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivity(intent);
-            }
+        gridView.setOnItemClickListener((parent, view12, position, id) -> {
+            // Obtener el nombre del archivo en la posición especificada
+            String fileName = gridViewAdapter.getFileName(position);
+            // Crear un Intent para abrir el archivo
+            String tripId12 = getActivity().getIntent().getStringExtra("tripId");
+            File file = new File(getActivity().getFilesDir(), "Galería/" + tripId12 + "/" + fileName);
+            Uri uri = FileProvider.getUriForFile(getActivity(), BuildConfig.APPLICATION_ID + ".provider", file);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri, "image/*");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(intent);
         });
 
     }
@@ -411,6 +371,7 @@ public class PhotoTabFragment extends Fragment {
                 if (!directory.exists()) {
                     directory.mkdirs();
                 }
+                assert fileName != null;
                 File file = new File(directory, fileName);
                 try {
                     InputStream inputStream = getActivity().getContentResolver().openInputStream(selectedImage);

@@ -16,7 +16,6 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -124,6 +123,7 @@ private BottomNavigationView bottomNavigationView;
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     double lat = document.getDouble("latitude");
                     double lon = document.getDouble("longitude");
+
                     CustomOverlayItem marker = new CustomOverlayItem("Lugar", "Description", new GeoPoint(lat, lon));
                     marker.setId(document.getId()); // Suponiendo que el ID del documento es el identificador único del marcador
                     markers.add(marker);
@@ -260,6 +260,7 @@ private BottomNavigationView bottomNavigationView;
             CollectionReference usersRef = db.collection("users");
 
             // Obtener la referencia al usuario actual (aquí necesitarás el ID del usuario actual)
+            assert user != null;
             String userId = user.getUid(); // "userId" es el ID del usuario actual
             DocumentReference userRef = usersRef.document(userId);
 

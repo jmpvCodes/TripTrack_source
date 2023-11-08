@@ -89,7 +89,6 @@ public class AlbumTabFragment extends Fragment {
         // Obtener la lista de carpetas en la carpeta tripId
         String tripId = requireActivity().getIntent().getStringExtra("tripId");
         File directory = new File(requireActivity().getFilesDir(), "Galería/" + tripId);
-        File[] files = directory.listFiles();
         File[] folders;
 
         if (directory.isDirectory()) {
@@ -232,7 +231,7 @@ public class AlbumTabFragment extends Fragment {
                 }
 
                 // Crear una nueva carpeta
-                File directory1 = new File(getActivity().getFilesDir(), "Galería/" + tripId + "/" + folderName);
+                File directory1 = new File(requireActivity().getFilesDir(), "Galería/" + tripId + "/" + folderName);
                 if (!directory1.exists()) {
                     directory1.mkdirs();
                 }
