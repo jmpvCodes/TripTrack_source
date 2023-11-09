@@ -91,26 +91,39 @@ public class LoginActivity extends AppCompatActivity {
         forgotPassText.setOnClickListener(v -> {
             String emailAddress = Objects.requireNonNull(emailEditText.getText()).toString().trim();
 
-            // Comprueba si el correo electrónico está registrado en Firebase
-            mAuth.fetchSignInMethodsForEmail(emailAddress)
-                    .addOnCompleteListener(task -> {
-                        boolean isNewUser = Objects.requireNonNull(task.getResult().getSignInMethods()).isEmpty();
+            // Validación del campo de correo electrónico
+            if (!Patterns.EMAIL_ADDRESS.matcher(emailAddress).matches()) {
+                emailEditText.setError("Correo inválido!");
+                return;
+            }
 
-                        // Si el correo electrónico no está registrado, se muestra un mensaje de error
-                        if (isNewUser) {
-                            emailEditText.setError("¡No se ha encontrado un correo electrónico registrado!");
-                            Toast.makeText(LoginActivity.this, "¡No se ha encontrado un correo electrónico registrado!", Toast.LENGTH_LONG).show();
+            else if (emailAddress.isEmpty()) {
+                emailEditText.setError("Correo electrónico requerido");
+            }
 
-                        } else {
-                            mAuth.sendPasswordResetEmail(emailAddress)
-                                    .addOnCompleteListener(task1 -> {
-                                        if (task1.isSuccessful()) {
-                                            Toast.makeText(LoginActivity.this, "Email enviado", Toast.LENGTH_LONG).show();
+            else {
+                emailEditText.setError(null);
+                // Comprueba si el correo electrónico está registrado en Firebase
+                mAuth.fetchSignInMethodsForEmail(emailAddress)
+                        .addOnCompleteListener(task -> {
+                            boolean isNewUser = Objects.requireNonNull(task.getResult().getSignInMethods()).isEmpty();
 
-                                        }
-                                    });
-                        }
-                    });
+                            // Si el correo electrónico no está registrado, se muestra un mensaje de error
+                            if (isNewUser) {
+                                emailEditText.setError("¡No se ha encontrado un correo electrónico registrado!");
+                                Toast.makeText(LoginActivity.this, "¡No se ha encontrado un correo electrónico registrado!", Toast.LENGTH_LONG).show();
+
+                            } else {
+                                mAuth.sendPasswordResetEmail(emailAddress)
+                                        .addOnCompleteListener(task1 -> {
+                                            if (task1.isSuccessful()) {
+                                                Toast.makeText(LoginActivity.this, "Email enviado", Toast.LENGTH_LONG).show();
+
+                                            }
+                                        });
+                            }
+                        });
+            }
         });
 
     }
@@ -126,17 +139,30 @@ public class LoginActivity extends AppCompatActivity {
         String password = Objects.requireNonNull(passwordEditText.getText()).toString().trim();
 
         // Validación de los campos de texto
-        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailEditText.setError("Correo inválido!");
             return;
-        } else {
+        }
+
+        else if (email.isEmpty()) {
+            emailEditText.setError("Correo electrónico requerido");
+        }
+
+        else {
             emailEditText.setError(null);
         }
+
         // Validación de la contraseña
-        if (password.isEmpty() || password.length() < 8) {
+        if (password.length() < 8) {
             passwordEditText.setError("Se necesitan más de 8 caracteres");
             return;
-        } else if (!Pattern.compile("[0-9]").matcher(password).find()) {
+        }
+
+        else if (password.isEmpty()) {
+            passwordEditText.setError("Contraseña requerida");
+        }
+
+        else if (!Pattern.compile("[0-9]").matcher(password).find()) {
             passwordEditText.setError("Se necesita al menos un número");
             return;
         } else {
