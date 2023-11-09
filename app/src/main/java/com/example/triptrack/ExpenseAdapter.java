@@ -29,7 +29,12 @@ public class ExpenseAdapter extends ArrayAdapter<Expense> {
     private final List<Expense> expenses;
 
 
-
+    /**
+     * Constructor de la clase ExpenseAdapter.
+     * @param context contexto de la aplicación
+     * @param expenses lista de gastos
+     * @param tripId ID del viaje
+     */
     public ExpenseAdapter(Context context, List<Expense> expenses, String tripId) {
         super(context, 0);
         this.filesDir = context.getFilesDir();
@@ -39,6 +44,9 @@ public class ExpenseAdapter extends ArrayAdapter<Expense> {
         File presupuestoDirectory = new File(filesDir, "Presupuesto");
         this.tripDirectory = new File(presupuestoDirectory, tripId);
     }
+    /**
+     * Establece el presupuesto del viaje.
+     */
     public void setBudget() {
     }
     @Override
@@ -110,9 +118,22 @@ public class ExpenseAdapter extends ArrayAdapter<Expense> {
         return convertView;
     }
 
+    /**
+     * Interfaz que se utiliza para notificar que un gasto ha sido eliminado.
+     */
     public interface OnDataChangeListener{
+
+        /**
+         * Método que se llama cuando un gasto ha sido eliminado.
+         * @param amount cantidad del gasto eliminado
+         */
         void onExpenseDeleted(double amount);
     }
+
+    /**
+     * Método que establece el OnDataChangeListener.
+     * @param onDataChangeListener OnDataChangeListener
+     */
     public void setOnDataChangeListener(OnDataChangeListener onDataChangeListener){
         this.onDataChangeListener = onDataChangeListener;
     }
