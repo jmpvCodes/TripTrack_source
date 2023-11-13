@@ -7,10 +7,11 @@
 
 	<RelativeLayout
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			>
+			android:layout_height="match_parent">
 
-		<LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
+		<LinearLayout android:layout_width="match_parent"
+					  android:layout_height="match_parent"
+					  android:orientation="vertical">
 
 
 
@@ -60,8 +61,6 @@
 
 		</androidx.appcompat.widget.Toolbar>
 
-
-
 		<com.airbnb.lottie.LottieAnimationView
 				android:id="@+id/lottieAnimationView"
 				android:layout_width="250dp"
@@ -92,6 +91,18 @@
 				android:text="¡Comienza desde hoy a inmortalizar los momentos de tu viaje!"
 		/>
 
+			<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+							xmlns:app="http://schemas.android.com/apk/res-auto"
+							android:layout_width="match_parent"
+							android:layout_height="match_parent">
+
+			<com.google.android.material.bottomnavigation.BottomNavigationView
+					android:id="@+id/bottom_navigation"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_alignParentBottom="true"
+					android:background="?android:attr/windowBackground"
+					app:menu="@menu/bottom_nav"/>
 			<GridView
 					android:id="@+id/gridView"
 					android:numColumns="auto_fit"
@@ -101,8 +112,7 @@
 					android:layout_height="450dp"
 					android:columnWidth="100dp"
 					android:horizontalSpacing="10dp"
-					android:verticalSpacing="10dp"
-			/>
+					android:verticalSpacing="10dp"/>
 
 			<com.google.android.material.floatingactionbutton.FloatingActionButton
 					android:id="@+id/createFolderButton"
@@ -116,17 +126,9 @@
 					android:scaleType="center"
 					app:backgroundTint="@color/colorAccent" />
 
-		</LinearLayout>
+			</RelativeLayout>
 
-		<!-- Bottom Navigation Bar -->
-		<com.google.android.material.bottomnavigation.BottomNavigationView
-				android:id="@+id/bottom_navigation"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_gravity="bottom"
-				android:layout_alignParentBottom="true"
-				android:background="?android:attr/windowBackground"
-				app:menu="@menu/bottom_nav"/>
+		</LinearLayout>
 
 
 
