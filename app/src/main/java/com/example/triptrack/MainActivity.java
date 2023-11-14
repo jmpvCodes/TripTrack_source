@@ -150,6 +150,12 @@ public class MainActivity extends AppCompatActivity {
                     Intent intentSettings = new Intent(MainActivity.this, ProfileActivity.class);
                     startActivity(intentSettings);
                     return true;
+
+                case R.id.create_incident:
+                    // Iniciar la actividad FinishedTripsActivity al seleccionar la opción "Viajes finalizados"
+                    Intent intentIncident = new Intent(MainActivity.this, SendIncidents.class);
+                    startActivity(intentIncident);
+                    return true;
                 case R.id.sign_out:
                     // Cerrar la sesión del usuario
                     FirebaseAuth.getInstance().signOut();

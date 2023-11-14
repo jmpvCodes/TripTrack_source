@@ -103,6 +103,17 @@
 					android:layout_alignParentBottom="true"
 					android:background="?android:attr/windowBackground"
 					app:menu="@menu/bottom_nav"/>
+
+				<com.google.android.material.floatingactionbutton.FloatingActionButton
+						android:id="@+id/createFolderButton"
+						android:layout_width="55dp"
+						android:layout_height="55dp"
+						android:layout_marginTop="480dp"
+						android:layout_marginLeft="300dp"
+						android:src="@drawable/ic_add"
+						android:layout_gravity="right|bottom"
+						android:scaleType="center"
+						app:backgroundTint="@color/colorAccent" />
 			<GridView
 					android:id="@+id/gridView"
 					android:numColumns="auto_fit"
@@ -114,19 +125,9 @@
 					android:horizontalSpacing="10dp"
 					android:verticalSpacing="10dp"/>
 
-			<com.google.android.material.floatingactionbutton.FloatingActionButton
-					android:id="@+id/createFolderButton"
-					android:layout_width="55dp"
-					android:layout_marginTop="20dp"
-					android:layout_marginBottom="20dp"
-					android:layout_marginRight="40dp"
-					android:layout_height="55dp"
-					android:src="@drawable/ic_add"
-					android:layout_gravity="right"
-					android:scaleType="center"
-					app:backgroundTint="@color/colorAccent" />
-
 			</RelativeLayout>
+
+
 
 		</LinearLayout>
 

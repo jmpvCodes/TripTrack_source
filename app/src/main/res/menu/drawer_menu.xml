@@ -12,6 +12,11 @@
 			android:title="Perfil" />
 
 	<item
+			android:id="@+id/create_incident"
+			android:title="Crear Incidencia"
+	/>
+
+	<item
 			android:id="@+id/sign_out"
 			android:title="Cerrar sesión"
 	/>
