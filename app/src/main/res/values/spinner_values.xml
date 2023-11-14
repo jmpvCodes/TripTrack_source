@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="incident_types">
+        <item>Error de aplicación</item>
+        <item>Problema de rendimiento</item>
+        <item>Error de interfaz de usuario</item>
+        <item>Otro</item>
+    </string-array>
+
+    <string-array name="problem_frequencies">
+        <item>Siempre</item>
+        <item>A veces</item>
+        <item>Raramente</item>
+    </string-array>
+</resources>

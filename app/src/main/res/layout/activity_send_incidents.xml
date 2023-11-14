@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical" >
+
+    <!-- AppBar -->
+    <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:orientation="horizontal"
+            android:backgroundTint="@color/white"
+            android:gravity="center_vertical"
+            android:background="#FFFFFF">
+
+        <ImageButton
+                android:id="@+id/back_button"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/white"
+                android:src="@drawable/ic_arrow_back"
+                android:contentDescription="BACK BUTTON"
+                android:scaleType="fitStart" />
+
+        <!-- Title -->
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView"
+                android:gravity="left"
+                android:text="CREAR INCIDENCIA"
+                android:textSize="16sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp" />
+
+        <!-- Logo -->
+        <ImageView
+                android:layout_width="130dp"
+                android:layout_gravity="right"
+                android:layout_height="wrap_content"
+                android:src="@drawable/triptrack_small"
+                android:scaleType="fitStart"
+                android:padding="14dp" />
+
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:orientation="vertical">
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nombre:" />
+
+        <EditText
+                android:id="@+id/edittext_first_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Apellidos:" />
+
+        <EditText
+                android:id="@+id/edittext_last_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Correo electrónico:" />
+
+        <EditText
+                android:id="@+id/edittext_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress" />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tipo de incidencia:" />
+
+        <Spinner
+                android:id="@+id/spinner_incident_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/incident_types" />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Descripción del problema:" />
+
+        <EditText
+                android:id="@+id/edittext_problem_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:lines="5"
+                android:maxLines="10"
+                android:scrollbars="vertical"
+                android:hint="Máximo 500 palabras" />
+
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Frecuencia del problema:" />
+
+        <Spinner
+                android:id="@+id/spinner_problem_frequency"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/problem_frequencies" />
+
+
+            <Button
+                    android:id="@+id/button_submit"
+                    android:layout_width="wrap_content"
+
+                    android:layout_gravity="center"
+                    android:layout_height="wrap_content"
+                    android:text="Enviar" />
+
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                    android:id="@+id/bottom_navigation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:background="?android:attr/windowBackground"
+                    app:menu="@menu/bottom_nav"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
