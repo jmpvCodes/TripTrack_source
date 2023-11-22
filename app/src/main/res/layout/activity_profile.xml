@@ -195,8 +195,8 @@
 
 			<com.airbnb.lottie.LottieAnimationView
 					android:id="@+id/level_animation"
-					android:layout_width="200dp"
-					android:layout_height="200dp"
+					android:layout_width="150dp"
+					android:layout_height="150dp"
 					android:layout_gravity="center"
 					app:lottie_autoPlay="true" />
 
