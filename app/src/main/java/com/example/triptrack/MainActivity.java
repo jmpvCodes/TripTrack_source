@@ -2,6 +2,7 @@ package com.example.triptrack;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -51,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
 
     private String uid;
 
+    private String destination, departureDate, returnDate, peopleCount, price;
+
     // Obtener una referencia a la base de datos
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -63,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         // Configurar la Toolbar (AppBar)
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -221,11 +225,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Obtener los valores de los campos del Intent
-        String destination = getIntent().getStringExtra("destination");
-        String departureDate = getIntent().getStringExtra("departureDate");
-        String returnDate = getIntent().getStringExtra("returnDate");
-        String peopleCount = getIntent().getStringExtra("peopleCount");
-        String price = getIntent().getStringExtra("price");
+         destination = getIntent().getStringExtra("destination");
+         departureDate = getIntent().getStringExtra("departureDate");
+         returnDate = getIntent().getStringExtra("returnDate");
+         peopleCount = getIntent().getStringExtra("peopleCount");
+         price = getIntent().getStringExtra("price");
 
 
         // Agregar el CardView con los datos del viaje
@@ -360,109 +364,132 @@ public class MainActivity extends AppCompatActivity {
         iconsLayout.addView(editIcon);
 
         // Agregar un OnClickListener al icono de editar
-        editIcon.setOnClickListener(v -> {
-            // Crear un AlertDialog.Builder para construir el AlertDialog
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("Editar viaje");
+        editIcon.setOnClickListener(new View.OnClickListener(){
+            /**
+             * @param view
+             */
+            @Override
+            public void onClick(View view) {
+                // Crear un AlertDialog.Builder para construir el AlertDialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Editar viaje");
 
-            // Inflar el layout del formulario de edición del viaje
-            LayoutInflater inflater = getLayoutInflater();
-            View dialogView = inflater.inflate(R.layout.dialog_edit_trip, null);
-            builder.setView(dialogView);
+                // Inflar el layout del formulario de edición del viaje
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.dialog_edit_trip, null);
+                builder.setView(dialogView);
 
-            // Obtener los campos del formulario
-            final EditText destinationEditText = dialogView.findViewById(R.id.destination_edit_text);
-            final EditText departureDateEditText = dialogView.findViewById(R.id.departure_date_edit_text);
-            final EditText returnDateEditText = dialogView.findViewById(R.id.return_date_edit_text);
-            final EditText peopleCountEditText = dialogView.findViewById(R.id.people_count_edit_text);
-            final EditText priceEditText = dialogView.findViewById(R.id.price_edit_text);
+                // Obtener los campos del formulario
+                 EditText destinationEditText = dialogView.findViewById(R.id.destination_edit_text);
+                 EditText departureDateEditText = dialogView.findViewById(R.id.departure_date_edit_text);
+                 EditText returnDateEditText = dialogView.findViewById(R.id.return_date_edit_text);
+                 EditText peopleCountEditText = dialogView.findViewById(R.id.people_count_edit_text);
+                 EditText priceEditText = dialogView.findViewById(R.id.price_edit_text);
 
-            // Mostrar los datos del viaje en los campos del formulario
-            destinationEditText.setText(destination);
-            departureDateEditText.setText(departureDate);
-            returnDateEditText.setText(returnDate);
-            peopleCountEditText.setText(peopleCount);
-            priceEditText.setText(price);
 
-            // Agregar un botón "Guardar" al AlertDialog
-            builder.setPositiveButton("Guardar", (dialog, which) -> {
-                // Obtener los valores de los campos del formulario
-                String newDestination = destinationEditText.getText().toString();
-                String newDepartureDate = departureDateEditText.getText().toString();
-                String newReturnDate = returnDateEditText.getText().toString();
-                String newPeopleCount = peopleCountEditText.getText().toString();
-                String newPrice = priceEditText.getText().toString();
 
-                // Verificar si alguno de los campos está vacío
-                boolean hasEmptyFields = false;
-                if (newDestination.isEmpty()) {
-                    destinationEditText.setError("Este campo es obligatorio");
-                    hasEmptyFields = true;
-                }
-                if (newDepartureDate.isEmpty()) {
-                    departureDateEditText.setError("Este campo es obligatorio");
-                    hasEmptyFields = true;
-                }
-                if (newReturnDate.isEmpty()) {
-                    returnDateEditText.setError("Este campo es obligatorio");
-                    hasEmptyFields = true;
-                }
-                if (newPeopleCount.isEmpty()) {
-                    peopleCountEditText.setError("Este campo es obligatorio");
-                    hasEmptyFields = true;
-                } else if (!newPeopleCount.matches("\\d+")) {
-                    peopleCountEditText.setError("Ingrese un valor numérico válido");
-                    hasEmptyFields = true;
-                }
+                // Mostrar los datos del viaje en los campos del formulario
+                destinationEditText.setText(destination);
+                departureDateEditText.setText(departureDate);
+                returnDateEditText.setText(returnDate);
+                peopleCountEditText.setText(peopleCount);
+                priceEditText.setText(price);
 
-                if (newPrice.isEmpty()) {
-                    priceEditText.setError("Este campo es obligatorio");
-                    hasEmptyFields = true;
-                } else if (!newPrice.matches("\\d+")) {
-                    priceEditText.setError("Ingrese un valor numérico válido");
-                    hasEmptyFields = true;
-                }
 
-                if (hasEmptyFields) {
-                    // Mostrar un mensaje al usuario
-                    Toast.makeText(MainActivity.this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                builder.setPositiveButton("Guardar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Obtener los valores de los campos del formulario
+                        String newDestination = destinationEditText.getText().toString();
+                        String newDepartureDate = departureDateEditText.getText().toString();
+                        String newReturnDate = returnDateEditText.getText().toString();
+                        String newPeopleCount = peopleCountEditText.getText().toString();
+                        String newPrice = priceEditText.getText().toString();
 
-                // Actualizar los datos del viaje en la base de datos de Firebase
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-                db.collection("users").document(uid).collection("viajes").document(tripId)
-                        .update(
-                                "destination", newDestination,
-                                "departureDate", newDepartureDate,
-                                "returnDate", newReturnDate,
-                                "peopleCount", newPeopleCount,
-                                "price", newPrice
-                        )
-                        .addOnSuccessListener(aVoid -> {
-                            // Los datos del viaje se actualizaron correctamente en la base de datos
 
-                            // Actualizar la visualización del viaje en la pantalla principal
-                            destinationText.setText(newDestination);
-                            departureDateText.setText("Ida: " + newDepartureDate);
-                            returnDateText.setText("Vuelta: " + newReturnDate);
-                            peopleCountText.setText(newPeopleCount + " Personas");
-                            priceText.setText(newPrice + " €");
-                        })
-                        .addOnFailureListener(e -> {
-                            // Ocurrió un error al intentar actualizar los datos del viaje en la base de datos
-                            Toast.makeText(MainActivity.this, "Error al actualizar el viaje", Toast.LENGTH_SHORT).show();
-                        });
-            });
-            // Agregar un botón "Cancelar" al AlertDialog
-            builder.setNegativeButton("Cancelar", (dialog, which) -> {
-                // Cerrar el AlertDialog sin guardar los cambios
-                dialog.dismiss();
-            });
+                        // Verificar si alguno de los campos está vacío
+                        boolean hasEmptyFields = false;
+                        if (newDestination.isEmpty()) {
+                            destinationEditText.setError("Este campo es obligatorio");
+                            hasEmptyFields = true;
+                        }
+                        if (newDepartureDate.isEmpty()) {
+                            departureDateEditText.setError("Este campo es obligatorio");
+                            hasEmptyFields = true;
+                        }
+                        if (newReturnDate.isEmpty()) {
+                            returnDateEditText.setError("Este campo es obligatorio");
+                            hasEmptyFields = true;
+                        }
+                        if (newPeopleCount.isEmpty()) {
+                            peopleCountEditText.setError("Este campo es obligatorio");
+                            hasEmptyFields = true;
+                        } else if (!newPeopleCount.matches("\\d+")) {
+                            peopleCountEditText.setError("Ingrese un valor numérico válido");
+                            hasEmptyFields = true;
+                        }
 
-            // Mostrar el AlertDialog
-            builder.show();
+                        if (newPrice.isEmpty()) {
+                            priceEditText.setError("Este campo es obligatorio");
+                            hasEmptyFields = true;
+                        } else if (!newPrice.matches("\\d+")) {
+                            priceEditText.setError("Ingrese un valor numérico válido");
+                            hasEmptyFields = true;
+                        }
+
+                        if (hasEmptyFields) {
+                            // Mostrar un mensaje al usuario
+                            Toast.makeText(MainActivity.this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // Actualizar los datos del viaje en la base de datos de Firebase
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                        db.collection("users").document(uid).collection("viajes").document(tripId)
+                                .update(
+                                        "destination", newDestination,
+                                        "departureDate", newDepartureDate,
+                                        "returnDate", newReturnDate,
+                                        "peopleCount", newPeopleCount,
+                                        "price", newPrice
+                                )
+                                .addOnSuccessListener(aVoid -> {
+                                    // Los datos del viaje se actualizaron correctamente en la base de datos
+
+                                    // Actualizar la visualización del viaje en la pantalla principal
+                                    destinationText.setText(newDestination);
+                                    departureDateText.setText("Ida: " + newDepartureDate);
+                                    returnDateText.setText("Vuelta: " + newReturnDate);
+                                    peopleCountText.setText(newPeopleCount + " Personas");
+                                    priceText.setText(newPrice + " €");
+
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Ocurrió un error al intentar actualizar los datos del viaje en la base de datos
+                                    Toast.makeText(MainActivity.this, "Error al actualizar el viaje", Toast.LENGTH_SHORT).show();
+                                });
+
+                    }
+                });
+
+                    // Agregar un botón "Cancelar" al AlertDialog
+                builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    /**
+                     * @param dialogInterface
+                     * @param i
+                     */
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // Cerrar el AlertDialog sin guardar los cambios
+                        dialogInterface.dismiss();
+
+                    }
+                });
+
+                // Mostrar el AlertDialog
+                builder.show();
+            }
         });
 
         // Crear el ImageView para el icono de completar
@@ -630,6 +657,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
     private void verifyTrips() {
         // Obtener todos los documentos de la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
         db.collection("users").document(uid).collection("viajes")

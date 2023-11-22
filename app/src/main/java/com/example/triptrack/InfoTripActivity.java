@@ -2,13 +2,21 @@ package com.example.triptrack;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -18,6 +26,9 @@ import java.util.Objects;
  */
 
 public class InfoTripActivity extends AppCompatActivity {
+
+    String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     // Código de solicitud para la selección de imágenes
 
@@ -30,6 +41,13 @@ public class InfoTripActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info_trip);
 
+        TextView destinationText = findViewById(R.id.destination_text);
+        TextView departureDateText = findViewById(R.id.departure_date_text);
+        TextView returnDateText = findViewById(R.id.return_date_text);
+        TextView peopleCountText = findViewById(R.id.people_count_text);
+        TextView priceText = findViewById(R.id.price_text);
+
+
         // Configurar la barra de herramientas
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -40,33 +58,37 @@ public class InfoTripActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> onBackPressed());
 
         // Obtener los datos del intent
-        Intent intent = getIntent();
-        String destination = intent.getStringExtra("destination");
-        String departureDate = intent.getStringExtra("departureDate");
-        String returnDate = intent.getStringExtra("returnDate");
-        String peopleCount = intent.getStringExtra("peopleCount");
-        String price = intent.getStringExtra("price");
+
         String tripId = getIntent().getStringExtra("tripId");
 
+        db.collection("users").document(uid).collection("viajes")
+                .whereEqualTo("tripId", tripId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                        if (documents.size() > 0) {
+                            // Recorrer todos los documentos y agregar un CardView para cada uno
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String destination = document.getString("destination");
+                                String departureDate = document.getString("departureDate");
+                                String returnDate = document.getString("returnDate");
+                                String peopleCount = document.getString("peopleCount");
+                                String price = document.getString("price");
+                            // Hay viajes en la colección "viajes" que no tienen el atributo "status" con valor "finalizado"
+                            destinationText.setText(destination);
+                            departureDateText.setText("Ida: " + departureDate);
+                            returnDateText.setText("Vuelta: " + returnDate);
+                            peopleCountText.setText(peopleCount + " Personas");
+                            priceText.setText(price + " €");
+                            }
+
+                        }
+                    }  // Error al obtener los datos de la colección "viajes"
+                });
 
         // Obtener una referencia al CardView
         findViewById(R.id.card_view);
-
-        // Obtener las referencias a los TextViews
-        TextView destinationText = findViewById(R.id.destination_text);
-        destinationText.setText(destination);
-
-        TextView departureDateText = findViewById(R.id.departure_date_text);
-        departureDateText.setText("Ida: " + departureDate);
-
-        TextView returnDateText = findViewById(R.id.return_date_text);
-        returnDateText.setText("Vuelta: " + returnDate);
-
-        TextView peopleCountText = findViewById(R.id.people_count_text);
-        peopleCountText.setText(peopleCount + " Personas");
-
-        TextView priceText = findViewById(R.id.price_text);
-        priceText.setText(price + " €");
 
         // Funcionalidad de importar documentos
         CardView importDocumentsCard = findViewById(R.id.import_documents);
